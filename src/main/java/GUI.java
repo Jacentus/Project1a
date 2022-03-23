@@ -22,22 +22,22 @@ public class GUI {
         System.out.println("If you wish to send a file when connected, type #FILE, click ENTER and specify the path of the file you wish to send.");
     }
 
-    public ClientsOptionsChoice chooseFromMenu(){
+    public Object chooseFromMenu(){
         System.out.println("Your choice: ");
         Scanner scanner = new Scanner(System.in);
         Integer choice = scanner.nextInt();
         switch (choice){
             case 1: // TODO: INPUT CONTROL
                 // TODO: weź listę wszystkich kanałów, wyświetl, daj wpisać nazwę, zapisz do tego kanału
-                return ClientsOptionsChoice.PRINT_ROOMS;
+                return null;
             case 2:
                 // TODO: zapytaj o nazwę, jeśli nie jest zajęta - utwórz nowy kanał
-                return ClientsOptionsChoice.START_NEW_PUBLIC_CHANNEL;
+                return null;
             case 3:
                 // TODO: zapytaj o nazwę, jeśli takiej nie ma - stwórz kanał, jeśli jest - dołącz
-                return ClientsOptionsChoice.START_PRIVATE_CHANNEL;
+                return null;
             case 4:
-                return ClientsOptionsChoice.DOWNLOAD_HISTORY; //TODO: ŚCIĄGNIJ HISTORIĘ JEŚLI BYŁEM NA DANYM KANALE
+                return null; //TODO: ŚCIĄGNIJ HISTORIĘ JEŚLI BYŁEM NA DANYM KANALE
             default:
                 System.out.println("Error");
         }

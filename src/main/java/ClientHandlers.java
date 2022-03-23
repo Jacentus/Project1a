@@ -1,5 +1,6 @@
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ClientHandlers {
+public class ClientHandlers implements Serializable {
 
     @Getter
     private final Map<String, ArrayList<ClientHandler>> clientHandlers = new TreeMap<>();  // zamieniłem na mapę!
@@ -32,7 +33,7 @@ public class ClientHandlers {
         lock.writeLock().lock();
         clientHandlers.get(clientHandler.getChannelName()).remove(clientHandler); // weź pokój -> wyrzuć z pokoju
         lock.writeLock().unlock();
-        clientHandler.broadcastMessage(String.format("SERVER: %s has left the %d channel!", clientHandler.getClientUsername()), clientHandler.getChannelName());
+        //clientHandler.broadcastMessage(String.format("SERVER: %s has left the %d channel!", clientHandler.getClientUsername()), clientHandler.getChannelName());
     }
 
 /*    public void broadcast(String text) {

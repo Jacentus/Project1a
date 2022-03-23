@@ -6,14 +6,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-// TODO: ograniczyć ilość wątków, egzekutor, pula wątków
+
 @Log
 public class Server {
 
     @Getter
-    private final static String HOST = "localhost";
+    private final static String HOST = "localhost"; // TODO: ograniczyć ilość wątków, egzekutor, pula wątków
     @Getter
-    private final static int PORT = 10000;
+    private final static int PORT = 10000; // do przemyślenia, czy nie wrzucić w config
 
     private final ServerSocket serverSocket;
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
@@ -24,10 +24,10 @@ public class Server {
         this.clientHandlers = new ClientHandlers();
     }
 
-    public void startServer(){
+    public void startServer() {
         logger.log(Level.INFO, "Server is listening on port: " + getPORT());
-        try{
-            while (!serverSocket.isClosed()){
+        try {
+            while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
                 logger.log(Level.INFO, "New Client has connected!");
                 ClientHandler clientHandler = new ClientHandler(socket, clientHandlers);
