@@ -1,0 +1,8 @@
+TESTOWANIE REQUEST HANDLERA DLA GETCHHCHANNELSREQUEST
+
+            ArrayList<ClientHandler> mockList = new ArrayList<>();
+            ClientHandler mockHandle = new ClientHandler(new Socket(), new ClientHandlers());
+            mockHandle.setChannelName("MOCK_KANAL");
+            mockHandle.setClientUsername("MOCK_USER");
+            mockList.add(mockHandle);
+            clientHandler.getClientHandlers().getMapOfAllRooms().put("MOCK_KANAL", mockList);

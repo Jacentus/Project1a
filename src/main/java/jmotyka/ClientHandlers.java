@@ -14,8 +14,14 @@ public class ClientHandlers implements Serializable {
 
     @Getter
     private final Map<String, ArrayList<ClientHandler>> mapOfAllRooms = new TreeMap<>();  // zamieniłem na mapę!
-
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+
+    public ClientHandlers() {
+        mapOfAllRooms.put("warszawa", new ArrayList<>());
+        mapOfAllRooms.put("gdansk", new ArrayList<>());
+        mapOfAllRooms.put("ogolny", new ArrayList<>());
+    }
 
     public void add(ClientHandler clientHandler) {
         String roomName = clientHandler.getChannelName();
