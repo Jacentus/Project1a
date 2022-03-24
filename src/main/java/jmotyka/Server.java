@@ -1,3 +1,7 @@
+package jmotyka;
+
+import jmotyka.ClientHandler;
+import jmotyka.ClientHandlers;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
@@ -25,7 +29,7 @@ public class Server {
     }
 
     public void startServer() {
-        logger.log(Level.INFO, "Server is listening on port: " + getPORT());
+        logger.log(Level.INFO, "jmotyka.Server is listening on port: " + getPORT());
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();

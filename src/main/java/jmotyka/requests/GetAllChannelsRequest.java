@@ -1,6 +1,4 @@
-package requests;
-
-import java.util.List;
+package jmotyka.requests;
 
 public class GetAllChannelsRequest extends Request{  // dostaję listę z nazwami wszytkich kanałów
 

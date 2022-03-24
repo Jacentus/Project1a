@@ -1,3 +1,5 @@
+package jmotyka;
+
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -11,27 +13,29 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ClientHandlers implements Serializable {
 
     @Getter
-    private final Map<String, ArrayList<ClientHandler>> clientHandlers = new TreeMap<>();  // zamieniłem na mapę!
+    private final Map<String, ArrayList<ClientHandler>> mapOfAllRooms = new TreeMap<>();  // zamieniłem na mapę!
+
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public void add(ClientHandler clientHandler) {
         String roomName = clientHandler.getChannelName();
+        System.out.println("TO NAZWA POKOJU: " + roomName + " a to nazwa usera: " + clientHandler.getClientUsername());
         lock.writeLock().lock();
-        if(clientHandlers.get(roomName) == null) {
+        if(mapOfAllRooms.isEmpty()) {
             ArrayList<ClientHandler> room = new ArrayList<>();
             room.add(clientHandler);
-            clientHandlers.put(roomName, room);
+            mapOfAllRooms.put(roomName, room);
             System.out.println("ILOŚĆ LUDZI NA NOWO UTWORZONYM KANALE: " + clientHandler.getChannelName() + " = " + room.size());
         } else {
-            clientHandlers.get(roomName).add(clientHandler);
-            System.out.println("ILOŚĆ LUDZI NA ISTNIEJĄCYM JUŻ KANALE: " + clientHandler.getChannelName() + " = " + clientHandlers.get(roomName).size());
+            mapOfAllRooms.get(roomName).add(clientHandler);
+            System.out.println("ILOŚĆ LUDZI NA ISTNIEJĄCYM JUŻ KANALE: " + clientHandler.getChannelName() + " = " + mapOfAllRooms.get(roomName).size());
         }
         lock.writeLock().unlock();
     }
 
     public void remove(ClientHandler clientHandler) {
         lock.writeLock().lock();
-        clientHandlers.get(clientHandler.getChannelName()).remove(clientHandler); // weź pokój -> wyrzuć z pokoju
+        mapOfAllRooms.get(clientHandler.getChannelName()).remove(clientHandler); // weź pokój -> wyrzuć z pokoju
         lock.writeLock().unlock();
         //clientHandler.broadcastMessage(String.format("SERVER: %s has left the %d channel!", clientHandler.getClientUsername()), clientHandler.getChannelName());
     }

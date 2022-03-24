@@ -1,4 +1,4 @@
-package responses;
+package jmotyka.responses;
 
 import lombok.Getter;
 

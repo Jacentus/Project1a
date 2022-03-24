@@ -1,27 +1,29 @@
-import clientRequestHandlers.RequestHandler;
+package jmotyka;
+
+import jmotyka.clientRequestHandlers.RequestHandler;
 import lombok.Getter;
 import lombok.Setter;
-import requests.GetAllChannelsRequest;
-import requests.JoinGroupChatRequest;
-import responses.GetAllChannelsResponse;
-import requests.Request;
-import requests.SendFileRequest;
-import responses.Response;
-import serverResponseHandlers.ResponseHandler;
+import jmotyka.requests.Request;
+import jmotyka.responses.Response;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.*;
 
 public class ClientHandler implements Runnable, Serializable{
     // moja lista userów i kanałów.
+    @Getter
     private final ClientHandlers clientHandlers;
 
+    @Getter
     private Socket socket;
 
+    @Getter
     private BufferedReader bufferedReader;
+    @Getter
     private BufferedWriter bufferedWriter;
+    @Getter
     private ObjectInputStream objectInputStream;
+    @Getter
     private ObjectOutputStream objectOutputStream;
 
     // do identyfikacji kanału i użytkownika
@@ -60,7 +62,7 @@ public class ClientHandler implements Runnable, Serializable{
         while (socket.isConnected()) {
             try {
                 //message = bufferedReader.readLine();
-                Response response = responseHandler.processRequest((Request)objectInputStream.readObject());
+                Response response = requestHandler.processRequest((Request)objectInputStream.readObject());
                 objectOutputStream.writeObject(response);
                 objectOutputStream.flush();
                 //broadcastMessage(message, channelName);
@@ -71,27 +73,6 @@ public class ClientHandler implements Runnable, Serializable{
             }
         }
     }
-
-
-    public void broadcastMessage(String message, String channelName) {
-        for(ClientHandler client : clientHandlers.getClientHandlers().get(channelName) ) {
-                    try {
-                        if (!client.clientUsername.equals(clientUsername)) {
-                            client.bufferedWriter.write(message);
-                            client.bufferedWriter.newLine();
-                            client.bufferedWriter.flush();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        close(socket, bufferedReader, bufferedWriter);
-                    }
-                }
-            }
-
-    /*public void removeClientHandler() {
-        clientHandlers.remove(this);
-        broadcastMessage(String.format("SERVER: %s has left the %s channel!", clientUsername, this.channelName), this.channelName); // TODO: pozamykać połączenia i pousuwać userów na każde zamknięcie/wyjście
-    }*/
 
     public void close(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
         clientHandlers.remove(this);

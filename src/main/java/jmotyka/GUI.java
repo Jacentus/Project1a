@@ -1,3 +1,5 @@
+package jmotyka;
+
 import java.util.Scanner;
 
 public class GUI {

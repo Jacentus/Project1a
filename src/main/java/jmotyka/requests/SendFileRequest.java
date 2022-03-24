@@ -1,4 +1,4 @@
-package requests;
+package jmotyka.requests;
 
 public class SendFileRequest extends Request {
 

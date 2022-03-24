@@ -1,4 +1,4 @@
-package responses;
+package jmotyka.responses;
 
 public class SendFileResponse extends Response{
 

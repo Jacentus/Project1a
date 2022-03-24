@@ -1,25 +1,38 @@
-import requests.Request;
-import responses.Response;
-import serverResponseHandlers.ResponseHandler;
+package jmotyka;
+
+import jmotyka.clientRequestHandlers.RequestHandler;
+import jmotyka.requests.Request;
+import jmotyka.responses.Response;
+import jmotyka.serverResponseHandlers.ResponseHandler;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Client {
 
+    private ResponseHandler responseHandler = new ResponseHandler(this);
+
+    @Getter
     private Socket socket;
-   // private BufferedReader bufferedReader;
-    //private BufferedWriter bufferedWriter;
-
+    @Getter
+    private BufferedReader bufferedReader;
+    @Getter
+    private BufferedWriter bufferedWriter;
+    @Getter
     private ObjectInputStream inputStreamReader;
+    @Getter
     private ObjectOutputStream outputStreamWriter;
-
+    @Getter
     private FileInputStream fileInputStream;
+    @Getter
     private FileOutputStream fileOutputStream;
-
+    @Getter
     private String username;
-    //private String channelName; // zmienna określająca, na jaki kanał chce nadawać Klient.
+
+    @Getter @Setter
+    private String channelName; // zmienna określająca, na jaki kanał chce nadawać Klient.
     //private ClientsOptionsChoice clientRequest; // początkowy request sterujący tym, co zrobi serwer
 
     public Client(Socket socket, String username) throws IOException {
@@ -38,7 +51,7 @@ public class Client {
         }
     }
 
-    public void sendMessage(Request request) {
+    public void sendRequest(Request request) {
         try {
             //bufferedWriter.write(username); // TODO: te rzeczy się powtarzają, na pewno mogę to przenieść do jakiejś innej klasy
             //bufferedWriter.newLine();
@@ -73,7 +86,7 @@ public class Client {
                 while (socket.isConnected()) {
                     try {
                         Response response = (Response) inputStreamReader.readObject();// dostaje objekt
-                        ResponseHandler responseHandler = new ResponseHandler(response);
+                        responseHandler.handleResponse(response); // przekazuję obiekt do klasy która wie co z tym zrobić oraz ma dostęp do zasobów klienta
                         //message = bufferedReader.readLine();
                         //System.out.println(message);
                     } catch (IOException | ClassNotFoundException e) {

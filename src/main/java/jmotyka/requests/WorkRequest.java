@@ -1,4 +1,4 @@
-package requests;
+package jmotyka.requests;
 
 public abstract class WorkRequest extends Request {
 
