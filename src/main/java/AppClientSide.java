@@ -1,4 +1,5 @@
 import requests.GetAllChannelsRequest;
+import requests.JoinGroupChatRequest;
 import requests.Request;
 
 import java.io.IOException;
@@ -22,8 +23,9 @@ public class AppClientSide {
         //mógłbym zebrać dane "w paczkę", co chce i kim jest Klient (username, wybór) i zanim wejdziemy do "loopa" z wymianą wiadomości, dostać informacje z serwera!
 
         Request request = new GetAllChannelsRequest(username);
+        Request request1 = new JoinGroupChatRequest("Jacentus", "KANAL");
 
-        client.sendMessage(request);
+        client.sendMessage(request1);
 
     }
 

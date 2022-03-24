@@ -36,7 +36,7 @@ public class ClientHandlers implements Serializable {
         //clientHandler.broadcastMessage(String.format("SERVER: %s has left the %d channel!", clientHandler.getClientUsername()), clientHandler.getChannelName());
     }
 
-/*    public void broadcast(String text) {
+/*    public void broadcast(String text) { // to metoda z przykładu z Sagesa
         lock.readLock().lock();
         clientHandlers.forEach(clientHandler -> clientHandler.send(text));
         lock.readLock().unlock();

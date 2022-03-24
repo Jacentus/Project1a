@@ -2,6 +2,7 @@ import clientRequestHandlers.RequestHandler;
 import lombok.Getter;
 import lombok.Setter;
 import requests.GetAllChannelsRequest;
+import requests.JoinGroupChatRequest;
 import responses.GetAllChannelsResponse;
 import requests.Request;
 import requests.SendFileRequest;
@@ -13,27 +14,33 @@ import java.net.Socket;
 import java.util.*;
 
 public class ClientHandler implements Runnable, Serializable{
-
+    // moja lista userów i kanałów.
     private final ClientHandlers clientHandlers;
 
     private Socket socket;
 
-    //private BufferedReader bufferedReader;
-    //private BufferedWriter bufferedWriter;
+    private BufferedReader bufferedReader;
+    private BufferedWriter bufferedWriter;
     private ObjectInputStream objectInputStream;
     private ObjectOutputStream objectOutputStream;
 
+    // do identyfikacji kanału i użytkownika
     @Getter @Setter
     private String clientUsername;
     @Getter @Setter
     private String channelName;
 
+    // próba procesowania otrzymywanych requestów
+    private final RequestHandler requestHandler = new RequestHandler(this);
+
     public ClientHandler(Socket socket, ClientHandlers clientHandlers) {
         this.clientHandlers = clientHandlers;
         try {
             this.socket = socket;
-            //this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // owijamy biteStream w charStream bo chcemy wysłać chary
-            //this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+            this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // owijamy biteStream w charStream bo chcemy wysłać chary
+            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             this.objectInputStream = new ObjectInputStream(socket.getInputStream());
             //this.clientUsername = bufferedReader.readLine(); // to do zmiany na protokół
@@ -53,7 +60,8 @@ public class ClientHandler implements Runnable, Serializable{
         while (socket.isConnected()) {
             try {
                 //message = bufferedReader.readLine();
-                objectOutputStream.writeObject(processRequest((Request)objectInputStream.readObject()));
+                Response response = responseHandler.processRequest((Request)objectInputStream.readObject());
+                objectOutputStream.writeObject(response);
                 objectOutputStream.flush();
                 //broadcastMessage(message, channelName);
             } catch (IOException | ClassNotFoundException e) {
@@ -64,27 +72,8 @@ public class ClientHandler implements Runnable, Serializable{
         }
     }
 
-    private Response processRequest(Request request) {
-        if(this.clientUsername == null) {
-            this.setClientUsername(request.getUserName());
-        }
-        if (request instanceof SendFileRequest){
-            for(ClientHandler client : clientHandlers.getClientHandlers().get(channelName) ){ //dostaję się do listy
-                //do sth
-            }
-        }
-        if (request instanceof GetAllChannelsRequest) { // działa
-            List<String> channelNames = new ArrayList<>();
-            clientHandlers.getClientHandlers().forEach((k,v) -> { channelNames.add(getChannelName());});
-            GetAllChannelsResponse getAllChannelsResponse = new GetAllChannelsResponse(channelNames);
-            if (getAllChannelsResponse.getAllChannelsNames()!=null) return getAllChannelsResponse;
-            else return null;
-        }
-        return null;
-    }
 
-
-/*    public void broadcastMessage(String message, String channelName) {
+    public void broadcastMessage(String message, String channelName) {
         for(ClientHandler client : clientHandlers.getClientHandlers().get(channelName) ) {
                     try {
                         if (!client.clientUsername.equals(clientUsername)) {
@@ -97,7 +86,7 @@ public class ClientHandler implements Runnable, Serializable{
                         close(socket, bufferedReader, bufferedWriter);
                     }
                 }
-            }*/
+            }
 
     /*public void removeClientHandler() {
         clientHandlers.remove(this);
@@ -120,7 +109,6 @@ public class ClientHandler implements Runnable, Serializable{
             e.printStackTrace();
         }
     }
-
 
 }
 

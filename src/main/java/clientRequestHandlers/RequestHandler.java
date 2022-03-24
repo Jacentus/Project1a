@@ -4,7 +4,7 @@ import requests.Request;
 
 public class RequestHandler {
 
-    public RequestHandler(Request request) {
+    public RequestHandler(ClientHandler clientHandler) {
     }
 
 }

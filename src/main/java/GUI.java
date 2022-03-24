@@ -18,8 +18,7 @@ public class GUI {
 
     public void printMenu(){
         System.out.println("***** CHAT APP *****");
-        System.out.println("[1] join existing channel [2] start new public channel [3] start or join private chat [4] download my message history");
-        System.out.println("If you wish to send a file when connected, type #FILE, click ENTER and specify the path of the file you wish to send.");
+        System.out.println("[1] join existing channel [2] start new public channel [3] start or join private chat [4] download my message history [5]");
     }
 
     public Object chooseFromMenu(){
