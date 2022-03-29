@@ -1,10 +1,7 @@
 package jmotyka;
 
-import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
 import lombok.Getter;
 import lombok.extern.java.Log;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -23,13 +20,13 @@ public class Server {
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
     private final ClientHandlers clientHandlers; // moja klasa do zarządzania pokojami, mam tam mapę wszelkich pokoi identyfikowanych po nazwie
 
-    public Server(ServerSocket serverSocket) {
+    public Server(ServerSocket serverSocket) { // TODO: thread safe!
         this.serverSocket = serverSocket;
         this.clientHandlers = new ClientHandlers();
     }
 
     public void startServer() {
-        logger.log(Level.INFO, "jmotyka.Server is listening on port: " + getPORT());
+        logger.log(Level.INFO, "Server is listening on port: " + getPORT());
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
@@ -48,13 +45,13 @@ public class Server {
     public void closeServerSocket() {
         try {
             if (serverSocket != null) {
+                logger.log(Level.INFO, "Closing server socket");
                 serverSocket.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }
 
 

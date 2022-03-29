@@ -1,21 +1,23 @@
 package jmotyka;
 
 import lombok.Getter;
-
+import lombok.extern.java.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
-
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@Log
 public class ClientHandlers implements Serializable {
 
     @Getter
-    private final Map<String, ArrayList<ClientHandler>> mapOfAllRooms = new TreeMap<>();  // zamieniłem na mapę!
+    private static final Map<String, ArrayList<ClientHandler>> mapOfAllRooms = new TreeMap<>(); //dodałem static, czy to możliwe że to ten problem?
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-
+    private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
 
     public ClientHandlers() {
         mapOfAllRooms.put("warszawa", new ArrayList<>());
@@ -23,34 +25,29 @@ public class ClientHandlers implements Serializable {
         mapOfAllRooms.put("ogolny", new ArrayList<>());
     }
 
-    public void add(ClientHandler clientHandler) {
+    public void addClientToRoom(ClientHandler clientHandler) {
         String roomName = clientHandler.getChannelName();
-        System.out.println("TO NAZWA POKOJU: " + roomName + " a to nazwa usera: " + clientHandler.getClientUsername());
         lock.writeLock().lock();
-        if(mapOfAllRooms.isEmpty()) {
+        if(mapOfAllRooms.isEmpty() || !mapOfAllRooms.containsKey(clientHandler.getChannelName())) {
             ArrayList<ClientHandler> room = new ArrayList<>();
             room.add(clientHandler);
             mapOfAllRooms.put(roomName, room);
-            System.out.println("ILOŚĆ LUDZI NA NOWO UTWORZONYM KANALE: " + clientHandler.getChannelName() + " = " + room.size());
+            logger.log(Level.INFO, String.format("New room %s has been created", clientHandler.getChannelName()));
+            logger.log(Level.INFO, String.format("%s active users in %s channel", room.size(), roomName));
         } else {
             mapOfAllRooms.get(roomName).add(clientHandler);
-            System.out.println("ILOŚĆ LUDZI NA ISTNIEJĄCYM JUŻ KANALE: " + clientHandler.getChannelName() + " = " + mapOfAllRooms.get(roomName).size());
+            logger.log(Level.INFO, String.format("New user %s entered %s channel", clientHandler.getClientUsername(), roomName));
+            logger.log(Level.INFO, String.format("%s active users in %s channel", mapOfAllRooms.get(roomName).size(), roomName));
         }
         lock.writeLock().unlock();
     }
 
     public void remove(ClientHandler clientHandler) {
+        logger.log(Level.INFO, String.format("Removing %s from  %s channel", clientHandler.getClientUsername(), clientHandler.getChannelName()));
         lock.writeLock().lock();
         mapOfAllRooms.get(clientHandler.getChannelName()).remove(clientHandler); // weź pokój -> wyrzuć z pokoju
+        logger.log(Level.INFO, String.format("Client %s left %s channel", clientHandler.getClientUsername(), clientHandler.getChannelName()));
         lock.writeLock().unlock();
-        //clientHandler.broadcastMessage(String.format("SERVER: %s has left the %d channel!", clientHandler.getClientUsername()), clientHandler.getChannelName());
     }
-
-/*    public void broadcast(String text) { // to metoda z przykładu z Sagesa
-        lock.readLock().lock();
-        clientHandlers.forEach(clientHandler -> clientHandler.send(text));
-        lock.readLock().unlock();
-    }*/
-
 
 }

@@ -5,12 +5,17 @@ import jmotyka.responses.Response;
 import jmotyka.serverResponseHandlers.ResponseHandler;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+@Log
 public class Client {
 
+    private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
     private Socket socket;
@@ -35,16 +40,22 @@ public class Client {
         }
     }
 
-    public void sendRequest(Request request) {
-        try {
-            while (socket.isConnected()) {
-                outputStreamWriter.writeObject(request);
-                outputStreamWriter.flush();
+    public void sendRequest(Request request) { // dodałem thread
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //while (socket.isConnected()) {
+                        logger.log(Level.INFO, "Sending request: " + request);
+                        outputStreamWriter.writeObject(request);
+                        outputStreamWriter.flush();
+                        logger.log(Level.INFO, "request sent");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    close(socket, outputStreamWriter, inputStreamReader);
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            close(socket, outputStreamWriter, inputStreamReader);
-        }
+        }).start();
     }
 
     public void listenForMessage() {
@@ -53,12 +64,13 @@ public class Client {
             public void run() {
                 while (socket.isConnected()) {
                     try {
-                        Response response = (Response) inputStreamReader.readObject();// dostaje objekt
-                        responseHandler.handleResponse(response); // przekazuję obiekt do klasy która wie co z tym zrobić oraz ma dostęp do zasobów klienta
+                        logger.log(Level.INFO, "Client is listening...");
+                        responseHandler.handleResponse((Response) inputStreamReader.readObject());// dostaje obiekt
+                        logger.log(Level.INFO, "Response has been handled by the Client");
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
-                }
+               }
             }
         }).start();
     }
