@@ -9,19 +9,14 @@ import java.nio.file.Files;
 public class SendFileRequest extends Request {
 
     @Getter
-    private byte[] file;
-    private File filePath;
+    private byte[] byteFile;
+    @Getter
     private String channelName;
 
-    public SendFileRequest(String userName, File filePath, String channelName) {
+    public SendFileRequest(String userName, String channelName, byte[] byteFile) {
         super(userName);
-        this.filePath = filePath;
         this.channelName = channelName;
-    }
-
-    public void transformIntoBytes(File filePath) throws IOException {
-        byte[] byteFile = Files.readAllBytes(filePath.toPath());
-        this.file = byteFile;
+        this.byteFile = byteFile;
     }
 
 }

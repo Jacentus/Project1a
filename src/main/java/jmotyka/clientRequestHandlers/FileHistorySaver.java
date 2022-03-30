@@ -27,15 +27,15 @@ public class FileHistorySaver implements ChatHistorySaver {
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
-    private ObjectOutputStream writer;
+    //private ObjectOutputStream writer;
 
     public FileHistorySaver() {
-        try{
+        /*try{
             this.writer = new ObjectOutputStream( new FileOutputStream(file));
         } catch (IOException e){
             e.printStackTrace();
             logger.log(Level.INFO, String.format("Exception when creating a fileHistorySaver"));
-        }
+        }*/
     }
 
     @Override
@@ -54,9 +54,11 @@ public class FileHistorySaver implements ChatHistorySaver {
                 chatHistory.get(channelName).add(message);
                 logger.log(Level.INFO, String.format("Message from %s saved to history of %s channel", message.getUserName(), message.getChannelName()));
             }
+            //
+            ObjectOutputStream writer = new ObjectOutputStream( new FileOutputStream(file));
             writer.writeObject(chatHistory);
             writer.flush();
-            //writer.close();
+            writer.close();
         } catch (IOException e){
             e.printStackTrace();
             logger.log(Level.INFO, String.format("Error when writing to file..."));

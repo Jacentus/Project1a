@@ -7,7 +7,9 @@ import jmotyka.responses.*;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -21,17 +23,17 @@ public class RequestHandler { // to działa na requestach, jakie wpadły na serw
     @Getter
     private final ClientHandler clientHandler;
     @Getter
-    private final ChatHistorySaver chatHistorySaver;
+    private static ChatHistorySaver chatHistorySaver  = new FileHistorySaver();
 
-    private final ChatHistoryReader chatHistoryReader;
+    private static ChatHistoryReader chatHistoryReader = new FileHistoryReader();
 
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
 
     public RequestHandler(ClientHandler clientHandler, ClientHandlers clientHandlers) {
         this.clientHandlers = clientHandlers;
         this.clientHandler = clientHandler;
-        this.chatHistorySaver = new FileHistorySaver();
-        this.chatHistoryReader = new FileHistoryReader();
+     /*   this.chatHistorySaver = new FileHistorySaver();   // PROBA ZMIANY NA JEDEN OUTPUT I INPUT STREAM
+        this.chatHistoryReader = new FileHistoryReader();*/
     }
 
     public void processRequest(Request request) throws IOException {
@@ -84,12 +86,11 @@ public class RequestHandler { // to działa na requestach, jakie wpadły na serw
             for (ClientHandler client : addressees) {
                 client.getObjectOutputStream().writeObject(messageResponse);
                 client.getObjectOutputStream().flush();
-                //clientHandler.getObjectOutputStream().close();
                 logger.log(Level.INFO, "Message sent to " + client.getClientUsername());
             }
             logger.log(Level.INFO, "handling request to remove from channel has finished...!");
         }
-        if (request instanceof GetChatHistoryRequest) { //TODO: NIE DZIAŁA
+        if (request instanceof GetChatHistoryRequest) { // działa ! Działa też kontrola dostępu po username
             logger.log(Level.INFO, "Trying to get channel history...");
             GetChatHistoryRequest getHistoryRequest = (GetChatHistoryRequest)request;
             try {
@@ -98,14 +99,28 @@ public class RequestHandler { // to działa na requestach, jakie wpadły na serw
                 channelHistory = chatHistoryReader.read(request.getUserName(), getHistoryRequest.getChannelName());
                 logger.log(Level.INFO, "came back to request handler to try block");
                 GetChatHistoryResponse response = new GetChatHistoryResponse(channelHistory);
-                clientHandler.getObjectOutputStream().writeObject(response); // TODO: CHECK IF IT WORKS
+                clientHandler.getObjectOutputStream().writeObject(response);
                 clientHandler.getObjectOutputStream().flush();
-                //clientHandler.getObjectOutputStream().close();
             } catch (NoAccessToChatHistoryException exception) {
+                System.out.println("to mój message z errora: " + exception.getMessage());
                 String error = exception.getMessage();
                 clientHandler.getObjectOutputStream().writeObject(new ErrorResponse(error));
                 clientHandler.getObjectOutputStream().flush();
+            }
+        }
+        if (request instanceof SendFileRequest){ // działa !!!
+            logger.log(Level.INFO, "Handling send file request...");
+            SendFileRequest sendFileRequest = (SendFileRequest)request;
+            //SendFileRequestHandler sendFileRequestHandler = new SendFileRequestHandler();
+            //byte[] file = sendFileRequestHandler.transformIntoBytes(sendFileRequest); // zamieniam plik na strumień bajtów
+            //logger.log(Level.INFO, "File should have been transformerd! Returned to RequestHandler");
+            ArrayList<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(sendFileRequest.getChannelName()); //biorę listę adresatów po kanale
+            SendFileResponse sendFileResponse = new SendFileResponse(sendFileRequest.getUserName(), sendFileRequest.getChannelName(), sendFileRequest.getByteFile());
+            for (ClientHandler client : addressees) { //iteruję po adresatach
+                client.getObjectOutputStream().writeObject(sendFileResponse);  // wysyłam plik zawinięty w obiekt Response do każdego z nich
+                client.getObjectOutputStream().flush();
                 //clientHandler.getObjectOutputStream().close();
+                logger.log(Level.INFO, "File sent to " + client.getClientUsername());
             }
         }
         // TODO: FURTHER REQUESTS

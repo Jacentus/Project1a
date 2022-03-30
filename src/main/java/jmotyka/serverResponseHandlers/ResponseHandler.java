@@ -5,7 +5,10 @@ import jmotyka.ClientHandler;
 import jmotyka.requests.MessageRequest;
 import jmotyka.responses.*;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 public class ResponseHandler { // to działa po stronie KLIENTA!
 
@@ -27,7 +30,7 @@ public class ResponseHandler { // to działa po stronie KLIENTA!
             MessageResponse messageResponse = (MessageResponse) response;
             System.out.println(messageResponse);
         }
-        if (response instanceof GetChatHistoryResponse){
+        if (response instanceof GetChatHistoryResponse){ // działa
             System.out.println("JESTEM W RESPONSE Z GETCHATHISTORY");
             GetChatHistoryResponse getChatHistoryResponse = (GetChatHistoryResponse)response;
             for (MessageRequest message : getChatHistoryResponse.getChatHistory()) {
@@ -37,7 +40,19 @@ public class ResponseHandler { // to działa po stronie KLIENTA!
         if (response instanceof ErrorResponse) {
             System.out.println("ERROR || " + ((ErrorResponse) response).getMessage());
         }
-        if (response instanceof SendFileResponse) {
+        if (response instanceof SendFileResponse) { //działa
+            System.out.println("A FILE HAS BEEN RECEIVED FROM " + ((SendFileResponse) response).getUserName());
+            String filePath = "D:\\RECEIVED_FILES\\newFile.pdf";
+            File file = new File(filePath);
+            try{
+                OutputStream os = new FileOutputStream(file);
+                os.write(((SendFileResponse) response).getFile());
+                os.close();
+                System.out.println("A FILE HAS BEEN READ SUCCESSFULLY");
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+
         }
     }
 

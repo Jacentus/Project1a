@@ -4,6 +4,10 @@ import jmotyka.requests.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -13,6 +17,7 @@ import java.util.logging.Logger;
 public class GUI {
 
     private final Logger logger = Logger.getLogger(getClass().getName()); //TODO: transfer to interface
+
 
     @Getter
     @Setter
@@ -67,24 +72,46 @@ public class GUI {
         }
     }
 
-    public void chatBox(Scanner scanner){
+    public void chatBox(Scanner scanner) {
         System.out.println("** START CHATTING **");
         System.out.println("** TYPE #EXIT TO QUIT, #FILE TO SEND A FILE **");
         String text = null;
         while (true) {
             text = scanner.nextLine();
-            if (text.equalsIgnoreCase("#EXIT")){
+            if (text.equalsIgnoreCase("#EXIT")) {
                 System.out.println("Exiting chatroom...");
                 break;
             }
-            if (text.equalsIgnoreCase("#FILE")){
-                System.out.println("TYPE PATH TO FILE: (eg. D:\\file.txt");
-                //TODO: SEND FILE TO USERS CONNECTED
+            if (text.equalsIgnoreCase("#FILE")) {
+                System.out.println("TYPE PATH TO FILE: (eg. D:\\file.txt)");
+                String path = scanner.nextLine();
+                File file = new File(path);
+                System.out.println("FILENAME: " + file.getName()); // dodać nazwę pliku do requesta tak, aby nie nadpisywał każdorazowo pliku już istniejącego
+                SendFileRequest sendFileRequest = transformIntoBytes(client.getUsername(), client.getChannelName(), file);
+                client.sendRequest(sendFileRequest);
+                logger.log(Level.INFO, "File request send");
+                text = null;
             }
-            MessageRequest message = new MessageRequest(client.getUsername(), client.getChannelName(), text);
-            client.sendRequest(message);
-            logger.log(Level.INFO, "Message send");
+            else {
+                MessageRequest message = new MessageRequest(client.getUsername(), client.getChannelName(), text);
+                client.sendRequest(message);
+                logger.log(Level.INFO, "Message send");
+            }
         }
+    }
+
+    public SendFileRequest transformIntoBytes(String userName, String channelName, File file) {
+        byte[] byteFile = new byte[0];
+        logger.log(Level.INFO, "Inside transform method form GUI...");
+        try {
+            byteFile = Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            logger.log(Level.INFO, "EXCEPTION READING FILE !!!");
+            System.out.println("exception when transforming file into bytes");
+            e.printStackTrace();
+        }
+        SendFileRequest sendFileRequest = new SendFileRequest(userName, channelName, byteFile);
+        return sendFileRequest;
     }
 
     public void printMenu() {

@@ -21,15 +21,15 @@ public class FileHistoryReader implements ChatHistoryReader {
     private ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
 
-    //private ObjectInputStream reader;
+    //private ObjectInputStream reader ; // MUSZE MIEC JEDEN READER I WRITER DO PLIKU, INACZEJ WYSKAKUJE MI CORRUPTED STREAM EXCEPTION. ZAIMPLEMENTOWAC
 
-    public FileHistoryReader(/*ChatHistoryReader fileHistoryReader*/) { // dodałem do konstruktowa aby w razie czego móc wyjąć jego inputreadera
-        //try {
-            //this.reader = new ObjectInputStream(new FileInputStream("history.txt")); /// tu chyba coś nie tak? Czy jeden input ?
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //    logger.log(Level.INFO, String.format("Exception when creating a fileHistoryReader"));
-      //  }
+    public FileHistoryReader() { // dodałem do konstruktowa aby w razie czego móc wyjąć jego inputreadera
+/*        try {
+            this.reader = new ObjectInputStream(new FileInputStream(FileHistorySaver.getFile())); /// tu chyba coś nie tak? Czy jeden input ?
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.log(Level.INFO, String.format("Exception when creating a fileHistoryReader"));
+        }*/
     }
 
     @Override
@@ -38,6 +38,7 @@ public class FileHistoryReader implements ChatHistoryReader {
         HashMap<String, List<MessageRequest>> historyFromAllChannels = null;
         List<MessageRequest> allMessagesFromChannel;
         lock.readLock().lock();
+
         try {
             logger.log(Level.INFO, String.format("Trying to read from file in the while loop...")); // chyba nie trafia tam gdzie powinien output....
             //
@@ -49,7 +50,6 @@ public class FileHistoryReader implements ChatHistoryReader {
             System.out.println("File: " + toRead);
             FileInputStream fIs = new FileInputStream(toRead);
             ObjectInputStream reader = new ObjectInputStream(fIs);
-
             //while (reader.available() > 0) {
                 object =  reader.readObject(); // to nie czyta !!!!!
                 reader.close();
