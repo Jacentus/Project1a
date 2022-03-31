@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -15,7 +16,10 @@ import java.util.logging.Logger;
 public class ClientHandlers implements Serializable {
 
     @Getter
-    private static final Map<String, ArrayList<ClientHandler>> mapOfAllRooms = new TreeMap<>(); //dodałem static, czy to możliwe że to ten problem?
+    private static final Map<String, List<ClientHandler>> mapOfAllRooms = new TreeMap<>(); //dodałem static, czy to możliwe że to ten problem?
+    @Getter
+    //private static final Map<List<String>, List<ClientHandler>> mapOfPrivateRooms = new TreeMap<>();
+
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
 
@@ -29,11 +33,12 @@ public class ClientHandlers implements Serializable {
         String roomName = clientHandler.getChannelName();
         lock.writeLock().lock();
         if(mapOfAllRooms.isEmpty() || !mapOfAllRooms.containsKey(clientHandler.getChannelName())) {
-            ArrayList<ClientHandler> room = new ArrayList<>();
+            addClientToNewRoom(roomName, clientHandler);
+ /*           ArrayList<ClientHandler> room = new ArrayList<>();
             room.add(clientHandler);
             mapOfAllRooms.put(roomName, room);
             logger.log(Level.INFO, String.format("New room %s has been created", clientHandler.getChannelName()));
-            logger.log(Level.INFO, String.format("%s active users in %s channel", room.size(), roomName));
+            logger.log(Level.INFO, String.format("%s active users in %s channel", room.size(), roomName));*/
         } else {
             mapOfAllRooms.get(roomName).add(clientHandler);
             logger.log(Level.INFO, String.format("New user %s entered %s channel", clientHandler.getClientUsername(), roomName));
@@ -41,6 +46,15 @@ public class ClientHandlers implements Serializable {
         }
         lock.writeLock().unlock();
     }
+
+    public void addClientToNewRoom(String roomName, ClientHandler clientHandler){
+        ArrayList<ClientHandler> room = new ArrayList<>();
+        room.add(clientHandler);
+        mapOfAllRooms.put(roomName, room);
+        logger.log(Level.INFO, String.format("New room %s has been created", clientHandler.getChannelName()));
+        logger.log(Level.INFO, String.format("%s active users in %s channel", room.size(), roomName));
+    }
+
 
     public void remove(ClientHandler clientHandler) {
         logger.log(Level.INFO, String.format("Removing %s from  %s channel", clientHandler.getClientUsername(), clientHandler.getChannelName()));

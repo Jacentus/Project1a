@@ -19,8 +19,8 @@ public class AppClientSide {
         Client client = new Client(socket, username);
 
         client.listenForMessage();
-        gui.setClient(client);
 
+        gui.setClient(client);
         gui.chooseFromMenu();
 
     }

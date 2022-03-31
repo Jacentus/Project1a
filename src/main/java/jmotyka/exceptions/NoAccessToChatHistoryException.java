@@ -1,4 +1,4 @@
-package jmotyka.clientRequestHandlers;
+package jmotyka.exceptions;
 
 import lombok.Getter;
 

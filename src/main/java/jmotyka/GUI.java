@@ -18,7 +18,6 @@ public class GUI {
 
     private final Logger logger = Logger.getLogger(getClass().getName()); //TODO: transfer to interface
 
-
     @Getter
     @Setter
     private Client client;
@@ -51,15 +50,9 @@ public class GUI {
                     client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), client.getChannelName()));
                     break;
                 case "3":
-                    System.out.println("Type channel name (you will join if already exists): ");// TODO: zapytaj o nazwę, jeśli nie jest zajęta - utwórz nowy kanał
-                    String newChannelName = scanner.nextLine();
-                    client.setChannelName(newChannelName);
-                    client.sendRequest(new JoinGroupChatRequest(client.getUsername(), client.getChannelName()));
+                    // TODO: PRIVATE CHANNEL
                     break;
                 case "4":
-                    // TODO: PRIVATE CHANNE:
-                    break;
-                case "5":
                     System.out.println("Type channel name you wish get history from: ");
                     String historicChannel = scanner.nextLine();
                     System.out.println(historicChannel + " TO JEST MOJ HISTORICCHANNEL");
@@ -85,8 +78,9 @@ public class GUI {
             if (text.equalsIgnoreCase("#FILE")) {
                 System.out.println("TYPE PATH TO FILE: (eg. D:\\file.txt)");
                 String path = scanner.nextLine();
+                // to przeniesc do osobnej metody? Klasy?
                 File file = new File(path);
-                System.out.println("FILENAME: " + file.getName()); // dodać nazwę pliku do requesta tak, aby nie nadpisywał każdorazowo pliku już istniejącego
+                System.out.println("FILENAME: " + file.getName()); // TODO: dodać nazwę pliku do requesta tak, aby nie nadpisywał każdorazowo pliku już istniejącego
                 SendFileRequest sendFileRequest = transformIntoBytes(client.getUsername(), client.getChannelName(), file);
                 client.sendRequest(sendFileRequest);
                 logger.log(Level.INFO, "File request send");
@@ -116,8 +110,8 @@ public class GUI {
 
     public void printMenu() {
         System.out.println("***** CHAT APP *****");
-        System.out.println("[1] show open channels [2] join/create open channel [3] start new public channel");
-        System.out.println("[4] start or join private chat [5] download my message history [6] send file ");
+        System.out.println("[1] show open channels [2] join/create open channel");
+        System.out.println("[3] start or join private channel [4] download my message history");
     }
 
 }

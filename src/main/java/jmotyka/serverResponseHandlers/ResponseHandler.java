@@ -12,10 +12,10 @@ import java.io.OutputStream;
 
 public class ResponseHandler { // to działa po stronie KLIENTA!
 
-    private Client client;
+    //private Client client;
 
     public ResponseHandler(Client client) {
-        this.client = client;
+        //this.client = client;
     }
 
     public void handleResponse(Response response) throws IOException {

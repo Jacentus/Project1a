@@ -40,10 +40,10 @@ public class Client {
         }
     }
 
-    public void sendRequest(Request request) { // dodałem thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+    public void sendRequest(Request request) { // dodałem thread, czy na pewno muszę...? Mam jeszcze maina przecież...
+    /*    new Thread(new Runnable() {
+            @Override*/
+        /*    public void run() {*/
                 try {
                     //while (socket.isConnected()) {
                         logger.log(Level.INFO, "Sending request: " + request);
@@ -54,8 +54,8 @@ public class Client {
                     e.printStackTrace();
                     close(socket, outputStreamWriter, inputStreamReader);
                 }
-            }
-        }).start();
+      /*      }
+        }).start();*/
     }
 
     public void listenForMessage() {
