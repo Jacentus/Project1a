@@ -32,14 +32,14 @@ public class GUI {
     public void chooseFromMenu() throws InterruptedException {
         while (true) {
             printMenu();
-            String choice = null;
+            String choice;
             System.out.print("Your choice: ");
-            Scanner scanner = new Scanner(System.in); // TODO: INPUT CONTROL
+            Scanner scanner = new Scanner(System.in);
             choice = scanner.nextLine();
             switch (choice) {
                 case "1":
                     client.sendRequest(new GetAllChannelsRequest(client.getUsername()));
-                    TimeUnit.SECONDS.sleep(3);
+                    TimeUnit.SECONDS.sleep(2);
                     break;
                 case "2":
                     System.out.println("Type channel name: ");
@@ -57,9 +57,10 @@ public class GUI {
                     String historicChannel = scanner.nextLine();
                     System.out.println(historicChannel + " TO JEST MOJ HISTORICCHANNEL");
                     client.sendRequest(new GetChatHistoryRequest(client.getUsername(), historicChannel));
+                    TimeUnit.SECONDS.sleep(2);
                     break;
                 default:
-                    System.out.println("error from choiceMenu");
+                    System.out.println("No such command in menu! Try again");
             }
             choice = null;
         }
@@ -86,6 +87,7 @@ public class GUI {
                 logger.log(Level.INFO, "File request send");
                 text = null;
             }
+
             else {
                 MessageRequest message = new MessageRequest(client.getUsername(), client.getChannelName(), text);
                 client.sendRequest(message);
@@ -111,7 +113,7 @@ public class GUI {
     public void printMenu() {
         System.out.println("***** CHAT APP *****");
         System.out.println("[1] show open channels [2] join/create open channel");
-        System.out.println("[3] start or join private channel [4] download my message history");
+        System.out.println("[3] start/join private channel [4] download my message history");
     }
 
 }

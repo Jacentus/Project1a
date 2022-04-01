@@ -6,6 +6,7 @@ import jmotyka.requests.MessageRequest;
 import jmotyka.responses.MessageResponse;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 public class MessageRequestHandler extends RequestHandler{
@@ -28,7 +29,7 @@ public class MessageRequestHandler extends RequestHandler{
         //
 
         logger.log(Level.INFO, "msg saved to history!");
-        ArrayList<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(messageResponse.getChannelName());
+        List<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(messageResponse.getChannelName());
         for (ClientHandler client : addressees) {
             broadcast(client, messageResponse);
             logger.log(Level.INFO, "Message sent to " + client.getClientUsername());

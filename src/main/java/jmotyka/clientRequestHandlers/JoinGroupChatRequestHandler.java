@@ -21,7 +21,7 @@ public class JoinGroupChatRequestHandler extends RequestHandler{
         System.out.println(request.getChannelName());
         logger.log(Level.INFO, "Joining to a group chat...!");
         clientHandler.setChannelName(request.getChannelName());
-        clientHandlers.addClientToRoom(clientHandler);
+        clientHandlers.addClientToOpenChannel(clientHandler);
         JoinGroupChatResponse joinGroupChatResponse = new JoinGroupChatResponse(request.getChannelName());
         broadcast(clientHandler, joinGroupChatResponse);
     }
