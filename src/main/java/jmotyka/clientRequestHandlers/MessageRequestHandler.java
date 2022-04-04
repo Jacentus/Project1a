@@ -29,7 +29,7 @@ public class MessageRequestHandler extends RequestHandler{
             PublicMessageRequest publicMessageRequest = (PublicMessageRequest) request;
             MessageResponse messageResponse = new PublicMessageResponse(publicMessageRequest.getUserName(), publicMessageRequest.getChannel(), publicMessageRequest.getText());
             logger.log(Level.INFO, "proceeding to save public msg to chat history......!");
-
+             // do poprawki na interfejs
             FileHistorySaver.saveToCache(publicMessageRequest);
 
             logger.log(Level.INFO, "msg saved to history!");

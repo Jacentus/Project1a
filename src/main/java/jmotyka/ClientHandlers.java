@@ -1,5 +1,6 @@
 package jmotyka;
 
+import jmotyka.entities.ChatHistory;
 import jmotyka.entities.PrivateChannel;
 import lombok.Getter;
 import lombok.extern.java.Log;

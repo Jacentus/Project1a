@@ -10,6 +10,7 @@ public class AppClientSide {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         Socket socket = new Socket(Server.getHOST(), Server.getPORT());
+
         GUI gui = new GUI();
 
         String username = gui.askForUsername();

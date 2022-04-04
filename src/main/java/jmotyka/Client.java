@@ -20,6 +20,8 @@ public class Client {
 
     @Getter
     private final ResponseHandler responseHandler = new ResponseHandler(this);
+    @Getter
+    private final ClientLockForServerResponse lock = new ClientLockForServerResponse();
 
     @Getter
     private Socket socket;

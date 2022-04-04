@@ -16,13 +16,14 @@ public class GUI {
 
     private final Logger logger = Logger.getLogger(getClass().getName()); //TODO: transfer to interface
     private final FileConverter fileConverter = new FileConverter();
+
     @Getter
     @Setter
     private Client client;
 
     public void printMenu() {
         System.out.println("***** CHAT APP *****");
-        System.out.println("[1] show open channels [2] join/create open channel");
+        System.out.println("[1] show open channels [2] join/create public channel");
         System.out.println("[3] create private channel [4] join private channel [5] download message history");
     }
 
@@ -64,9 +65,9 @@ public class GUI {
 
                     String permittedUser = null;
                     privateChannel.getPermittedUsers().add(client.getUsername());
-                    while(true){
+                    while (true) {
                         permittedUser = scanner.nextLine();
-                        if (permittedUser.equalsIgnoreCase("#DONE")){
+                        if (permittedUser.equalsIgnoreCase("#DONE")) {
                             System.out.println("BREAK!");
                             break;
                         }
@@ -74,33 +75,37 @@ public class GUI {
                     }
                     client.setPrivateChannel(privateChannel);
                     client.sendRequest(new CreatePrivateChatRequest(client.getUsername(), client.getPrivateChannel()));
-                    //tego chyba nie potrzebuje, załatwia to create....
-                    //client.sendRequest(new JoinPrivateChatRequest(client.getUsername(), client.getPrivateChannel()));// TODO: PRIVATE CHANNEL
                     ChatBox chatBox = new PrivateChatBox(scanner, fileConverter, client);
                     chatBox.launchChatBox();
-                    //chatBox(scanner); //TODO: MAKE CHATBOX WORK FOR BOTH KIND OF MESSAGES
                     // TODO: remove from channel, unset client private channel
                     client.setPrivateChannel(null);
                     break;
                 case "4":
                     System.out.println("Type channel name you want to join: ");
                     String privateChannelName = scanner.nextLine();
+                    //System.out.println("A TO CLIENT W GUI: " + client + "i jego czy permitted przed requestem: " + client.getPrivateChannel().getClientPermittedToChat());
+                    // to nie działa muszę dać chyba CountDownLatch
 
-                    synchronized (this) { // to nie działa muszę dać chyba CountDownLatch
-                        client.setPrivateChannel(new PrivateChannel(privateChannelName)); // ze względu na equals powinno dać się znaleźć po nazwie
-
+                    client.setPrivateChannel(new PrivateChannel(privateChannelName)); // ze względu na equals powinno dać się znaleźć po nazwie
+                    System.out.println("Client w gui: " + client);
+                    client.getLock().getServerResponseLock().lock();
+                    try {
                         client.sendRequest(new JoinPrivateChatRequest(client.getUsername(), client.getPrivateChannel()));
-
-                        //Thread.currentThread().join();
+                        System.out.println("thread should be waiting...");
+                        client.getLock().getResponseHandled().await();
+                    } finally {
+                        client.getLock().getServerResponseLock().unlock();
                     }
-                        System.out.println("A TO CLIENT W GUI: " + client);
-                        System.out.println("przed ifem w GUI odpalającym chatbox. Permitted: " + client.getPrivateChannel().getClientPermittedToChat());
-                    client.getPrivateChannel().setClientPermittedToChat(true); // to tylko na potrzeby testów !!! Konieczna synchronizacja wątków !!!
-                     // to powoduje, że każdy mimo braku dostępu będzie miał odpalony chatbox
-                        // jest problem z threadem, najpierw wykonuje się to, nie czekając na odpowiedź z serwera
-                        //Thread.currentThread().wait(1000);
 
-                    if(client.getPrivateChannel().getClientPermittedToChat() == true) {
+                    //Thread.currentThread().join();
+
+                    System.out.println("przed ifem w GUI odpalającym chatbox. Permitted: " + client.getPrivateChannel().getClientPermittedToChat());
+                    //client.getPrivateChannel().setClientPermittedToChat(true); // to tylko na potrzeby testów !!! Konieczna synchronizacja wątków !!!
+                    // to powoduje, że każdy mimo braku dostępu będzie miał odpalony chatbox
+                    // jest problem z threadem, najpierw wykonuje się to, nie czekając na odpowiedź z serwera
+                    //Thread.currentThread().wait(1000);
+
+                    if (client.getPrivateChannel().getClientPermittedToChat() == true) {
                         ChatBox chatBox1 = new PrivateChatBox(scanner, fileConverter, client);
                         chatBox1.launchChatBox();
                         //chatBox(scanner); //TODO: MAKE CHATBOX WORK FOR BOTH KIND OF MESSAGES
@@ -111,7 +116,7 @@ public class GUI {
                 case "5":
                     System.out.println("Private or public channel? [1] PRIVATE [2] PUBLIC");
                     String historyChoice = scanner.nextLine();
-                    switch (historyChoice){
+                    switch (historyChoice) {
                         case "1":
                             System.out.println("Type channel name you wish get history from: ");
                             String historicPrivateChannelName = scanner.nextLine();

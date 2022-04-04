@@ -1,4 +1,6 @@
-package jmotyka;
+package jmotyka.chathistoryreaderandwriter;
+
+import jmotyka.ClientHandlers;
 
 import java.io.File;
 import java.io.FileOutputStream;

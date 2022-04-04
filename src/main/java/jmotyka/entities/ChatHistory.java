@@ -1,4 +1,4 @@
-package jmotyka;
+package jmotyka.entities;
 
 import jmotyka.chathistoryreaderandwriter.FileHistoryReader;
 import jmotyka.chathistoryreaderandwriter.FileHistorySaver;

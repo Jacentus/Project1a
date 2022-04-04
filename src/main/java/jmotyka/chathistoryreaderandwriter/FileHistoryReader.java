@@ -20,16 +20,20 @@ public class FileHistoryReader implements ChatHistoryReader {
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
 
     public List<MessageRequest> readFromCache(String userName, String channelName) throws NoAccessToChatHistoryException {
-        logger.log(Level.INFO, String.format("Inside chat reader"));
-        lock.readLock().lock();
-        List<MessageRequest> allMessagesFromChannel;
-        allMessagesFromChannel = getMessagesFromChannel(channelName, ClientHandlers.getHistory().getPublicChatHistory());
-        Boolean permittedToSeeHistory = validateUser(allMessagesFromChannel, userName);
-        lock.readLock().unlock();
-        if (permittedToSeeHistory==true) {
-            return allMessagesFromChannel;
-        } else throw new NoAccessToChatHistoryException("YOU ARE NOT ENTITLED TO VIEW THIS CHANNEL'S HISTORY");
+        try {
+            logger.log(Level.INFO, String.format("Inside chat reader"));
+            lock.readLock().lock();
+            List<MessageRequest> allMessagesFromChannel;
+            allMessagesFromChannel = getMessagesFromChannel(channelName, ClientHandlers.getHistory().getPublicChatHistory());
+            Boolean permittedToSeeHistory = validateUser(allMessagesFromChannel, userName);
+            if (permittedToSeeHistory == true) {
+                return allMessagesFromChannel;
+            } else throw new NoAccessToChatHistoryException("YOU ARE NOT ENTITLED TO VIEW THIS CHANNEL'S HISTORY");
+        } finally {
+            lock.readLock().unlock();
+        }
     }
+
 
     public List<MessageRequest> readFromCache(String userName, PrivateChannel privateChannel) throws NoAccessToChatHistoryException {
         try {
