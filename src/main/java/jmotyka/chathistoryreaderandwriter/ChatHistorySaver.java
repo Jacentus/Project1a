@@ -2,8 +2,13 @@ package jmotyka.chathistoryreaderandwriter;
 
 import jmotyka.requests.MessageRequest;
 
+import java.io.File;
+import java.util.Map;
+
 public interface ChatHistorySaver {
 
-    void save(MessageRequest request);
+  //  <T extends Map> void saveHistoryToFile(File file, T map);
+
+   // <T extends MessageRequest> void saveToCache(T request);
 
 }

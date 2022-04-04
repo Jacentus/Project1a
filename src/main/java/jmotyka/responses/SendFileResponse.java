@@ -9,11 +9,11 @@ public class SendFileResponse extends Response{
     @Getter
     private byte[] file;
     @Getter
-    private String channelName;
+    private String fileName;
 
-    public SendFileResponse(String userName, String channelName, byte[] file) {
+    public SendFileResponse(String userName, String fileName, byte[] file) {
         this.userName = userName;
-        this.channelName = channelName;
+        this.fileName = fileName;
         this.file = file;
     }
 

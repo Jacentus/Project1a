@@ -7,5 +7,7 @@ Stwórz czat tekstowy/aplikację klient-server wykorzystując Java Sockets. Apli
 - przesyłanie plików między osobami na danym kanale
 - zapamiętywanie historii rozmów po stronie serwera w bazie opartej o plik płaski
 - możliwość przeglądania historii rozmów z poziomu klienta (jeśli uczestniczył on w rozmowie/był na kanale)
+
 Obsługa aplikacji powinna odbywać się z terminala/linii komend (interfejs tekstowy) dla 1a oraz REST API w przypadku 1b.
+
 Uwaga! Należy zwrócić szczególną uwagę na aspekty związane z wielowątkowością - zapewnić zarówno bezpieczeństwo jak wydajność całego rozwiązania.

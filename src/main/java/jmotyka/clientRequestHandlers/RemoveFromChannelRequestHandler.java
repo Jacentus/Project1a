@@ -4,6 +4,8 @@ import jmotyka.ClientHandler;
 import jmotyka.ClientHandlers;
 import jmotyka.requests.RemoveFromChannelRequest;
 import jmotyka.responses.MessageResponse;
+import jmotyka.responses.PrivateMessageResponse;
+import jmotyka.responses.PublicMessageResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class RemoveFromChannelRequestHandler extends RequestHandler{
     public void processRequest() {
         logger.log(Level.INFO, "Handling removing from channel request...!");
         clientHandlers.remove(clientHandler);
-        MessageResponse messageResponse = new MessageResponse("SERVER: ", request.getUserName(), "HAS LEFT THE CHANNEL!");
+        MessageResponse messageResponse = new PublicMessageResponse("SERVER: " + request.getUserName() ,request.getChannelName()," HAS LEFT THE CHANNEL!");
         List<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(((RemoveFromChannelRequest) request).getChannelName());
         for (ClientHandler client : addressees) {
             broadcast(client, messageResponse);

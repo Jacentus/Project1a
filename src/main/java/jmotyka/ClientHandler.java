@@ -2,6 +2,7 @@ package jmotyka;
 
 import jmotyka.clientRequestHandlers.RequestHandler;
 import jmotyka.clientRequestHandlers.RequestHandlersFactory;
+import jmotyka.entities.PrivateChannel;
 import lombok.Getter;
 import lombok.Setter;
 import jmotyka.requests.Request;
@@ -29,6 +30,9 @@ public class ClientHandler implements Runnable {
     private String clientUsername;
     @Getter @Setter
     private String channelName;
+
+    @Getter @Setter
+    private PrivateChannel privateChannel; // to identify private channel in new map. Czy ja tego w ogóle używam?
 
     private RequestHandlersFactory requestHandlersFactory;
 

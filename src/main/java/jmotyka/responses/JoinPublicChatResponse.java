@@ -2,12 +2,12 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-public class JoinGroupChatResponse extends Response{
+public class JoinPublicChatResponse extends Response{
 
     @Getter
     private String channelName;
 
-    public JoinGroupChatResponse(String channelName) {
+    public JoinPublicChatResponse(String channelName) {
         this.channelName = channelName;
     }
 }

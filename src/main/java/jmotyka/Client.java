@@ -1,5 +1,6 @@
 package jmotyka;
 
+import jmotyka.entities.PrivateChannel;
 import jmotyka.requests.Request;
 import jmotyka.responses.Response;
 import jmotyka.serverResponseHandlers.ResponseHandler;
@@ -16,7 +17,10 @@ import java.util.logging.Logger;
 public class Client {
 
     private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
+
+    @Getter
     private final ResponseHandler responseHandler = new ResponseHandler(this);
+
     @Getter
     private Socket socket;
     @Getter
@@ -27,6 +31,8 @@ public class Client {
     private String username;
     @Getter @Setter
     private String channelName;
+    @Getter @Setter
+    private PrivateChannel privateChannel;
 
     public Client(Socket socket, String username) throws IOException {
         try {

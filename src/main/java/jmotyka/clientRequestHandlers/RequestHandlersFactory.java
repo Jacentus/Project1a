@@ -3,13 +3,7 @@ package jmotyka.clientRequestHandlers;
 import jmotyka.ClientHandler;
 import jmotyka.ClientHandlers;
 import jmotyka.requests.*;
-import jmotyka.responses.*;
-import lombok.Getter;
 import lombok.extern.java.Log;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Log
 public class RequestHandlersFactory {
@@ -38,11 +32,23 @@ public class RequestHandlersFactory {
         if (request instanceof RemoveFromChannelRequest){
             return new RemoveFromChannelRequestHandler(clientHandlers, clientHandler, (RemoveFromChannelRequest) request);
         }
-        if (request instanceof GetChatHistoryRequest){
-            return new GetChatHistoryRequestHandler(clientHandlers, clientHandler, (GetChatHistoryRequest) request);
+        if (request instanceof GetPrivateChannelHistoryRequest){
+            return new GetPrivateChannelHistoryRequestHandler(clientHandlers, clientHandler, (GetPrivateChannelHistoryRequest) request);
         }
-        if (request instanceof SendFileRequest){
-            return new SendFileRequestHandler(clientHandlers, clientHandler, (SendFileRequest) request);
+        if (request instanceof GetPublicChannelHistoryRequest){
+            return new GetPublicChannelHistoryRequestHandler(clientHandlers, clientHandler, (GetPublicChannelHistoryRequest) request);
+        }
+        if (request instanceof SendFilePrivatelyRequest){
+            return new SendFilePrivatelyRequestHandler(clientHandlers, clientHandler, (SendFileRequest) request);
+        }
+        if (request instanceof SendFilePubliclyRequest){
+            return new SendFilePubliclyRequestHandler(clientHandlers, clientHandler, (SendFileRequest) request);
+        }
+        if (request instanceof CreatePrivateChatRequest) {
+            return new CreatePrivateChatRequestHandler(clientHandlers, clientHandler, (CreatePrivateChatRequest) request);
+        }
+        if (request instanceof JoinPrivateChatRequest) {
+            return new JoinPrivateChatRequestHandler(clientHandlers, clientHandler, (JoinPrivateChatRequest) request);
         }
         else return null;
     }

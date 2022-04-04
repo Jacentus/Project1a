@@ -6,16 +6,16 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class SendFileRequest extends Request {
+public abstract class SendFileRequest extends Request {
 
     @Getter
     private byte[] byteFile;
     @Getter
-    private String channelName;
+    private String fileName;
 
-    public SendFileRequest(String userName, String channelName, byte[] byteFile) {
+    public SendFileRequest(String userName, String fileName, byte[] byteFile) {
         super(userName);
-        this.channelName = channelName;
+        this.fileName = fileName;
         this.byteFile = byteFile;
     }
 

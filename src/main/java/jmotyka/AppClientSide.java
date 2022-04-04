@@ -1,9 +1,6 @@
 package jmotyka;
 
-import jmotyka.requests.GetAllChannelsRequest;
-import jmotyka.requests.JoinGroupChatRequest;
-import jmotyka.requests.MessageRequest;
-import jmotyka.requests.Request;
+import jmotyka.GUI.GUI;
 
 import java.io.IOException;
 import java.net.Socket;
