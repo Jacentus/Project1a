@@ -1,6 +1,4 @@
-package jmotyka.chathistoryreaderandwriter;
-
-import jmotyka.exceptions.NoAccessToChatHistoryException;
+package jmotyka.chatHistoryReaderAndWriter;
 
 import java.io.File;
 import java.util.List;

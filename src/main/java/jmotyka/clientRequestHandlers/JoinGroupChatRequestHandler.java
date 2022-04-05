@@ -1,18 +1,20 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
+import jmotyka.ClientHandlersManager;
 import jmotyka.requests.JoinGroupChatRequest;
 import jmotyka.responses.JoinPublicChatResponse;
+import jmotyka.responses.PublicMessageResponse;
 
+import java.util.List;
 import java.util.logging.Level;
 
 public class JoinGroupChatRequestHandler extends RequestHandler{
 
     private JoinGroupChatRequest request;
 
-    public JoinGroupChatRequestHandler(ClientHandlers clientHandlers, ClientHandler clientHandler, JoinGroupChatRequest request) {
-        super(clientHandlers, clientHandler);
+    public JoinGroupChatRequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler, JoinGroupChatRequest request) {
+        super(clientHandlersManager, clientHandler);
         this.request = request;
     }
 
@@ -21,9 +23,16 @@ public class JoinGroupChatRequestHandler extends RequestHandler{
         System.out.println(request.getChannelName());
         logger.log(Level.INFO, "Joining to a group chat...!");
         clientHandler.setChannelName(request.getChannelName());
-        clientHandlers.addClientToOpenChannel(clientHandler);
+        clientHandlersManager.addClientToPublicChannel(clientHandler);
         JoinPublicChatResponse joinPublicChatResponse = new JoinPublicChatResponse(request.getChannelName());
         broadcast(clientHandler, joinPublicChatResponse);
+        List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPublicChannels().get(clientHandler.getChannelName());
+        for (ClientHandler client : addressees) {
+            if(request.getUserName() != client.getClientUsername()) {
+                broadcast(client, new PublicMessageResponse("SERVER: ", request.getUserName(), "HAS ENTERED THE CHANNEL!"));
+                logger.log(Level.INFO, "Message sent to " + client.getClientUsername());
+            }
+        }
     }
 
 }

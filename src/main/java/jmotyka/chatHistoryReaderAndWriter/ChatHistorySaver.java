@@ -1,9 +1,4 @@
-package jmotyka.chathistoryreaderandwriter;
-
-import jmotyka.requests.MessageRequest;
-
-import java.io.File;
-import java.util.Map;
+package jmotyka.chatHistoryReaderAndWriter;
 
 public interface ChatHistorySaver {
 

@@ -15,18 +15,20 @@ public class PrivateChatBox extends ChatBox{
         super(scanner, fileConverter, client);
     }
 
+    @Override
     public void sendMessage(String text){
-        System.out.println("SENDING MESSAGE FROM PRIVATE CHATBOX...");
         MessageRequest message = new PrivateMessageRequest(client.getUsername(), client.getPrivateChannel(), text);
-        System.out.println("LISTA USERÓW KANAŁU: " + client.getPrivateChannel().getPermittedUsers());
+        logger.log(Level.INFO, "Addressees: " + client.getPrivateChannel().getPermittedUsers());
         client.sendRequest(message);
         logger.log(Level.INFO, "Private message has been send");
     }
 
+    @Override
     public void sendFile(File file){
         byte[] bytes = fileConverter.transformIntoBytes(file);
         SendFilePrivatelyRequest request = new SendFilePrivatelyRequest(client.getUsername(), file.getName(), bytes, client.getPrivateChannel());
         client.sendRequest(request);
+        logger.log(Level.INFO, "File send privately");
     }
 
 }

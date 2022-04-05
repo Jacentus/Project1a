@@ -1,13 +1,11 @@
 package jmotyka.entities;
 
-import jmotyka.chathistoryreaderandwriter.FileHistoryReader;
-import jmotyka.chathistoryreaderandwriter.FileHistorySaver;
-import jmotyka.entities.PrivateChannel;
+import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
+import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
+import jmotyka.chatHistoryReaderAndWriter.FileHistorySaver;
 import jmotyka.requests.MessageRequest;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.io.EOFException;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +20,11 @@ public class ChatHistory {
     @Getter
     private final FileHistorySaver fileHistorySaver = new FileHistorySaver();
     @Getter
-    private final FileHistoryReader fileHistoryReader = new FileHistoryReader();
+    private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
     @Getter
     private Map<String, List<MessageRequest>> publicChatHistory;
     @Getter
-    private Map<PrivateChannel, List<MessageRequest>> privateChatHistory = new HashMap<>();
+    private Map<PrivateChannel, List<MessageRequest>> privateChatHistory;
 
     public ChatHistory() {
         try {
@@ -42,7 +40,7 @@ public class ChatHistory {
             }
         } catch (Exception e){
             e.printStackTrace();
-            System.out.println("EXCEPTION EMPTY FILE WAS READ");
+            System.out.println("EXCEPTION - EMPTY FILE WAS READ");
         }
     }
 

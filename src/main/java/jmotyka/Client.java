@@ -16,13 +16,11 @@ import java.util.logging.Logger;
 @Log
 public class Client {
 
-    private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
-
+    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
     @Getter
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
     private final ClientLockForServerResponse lock = new ClientLockForServerResponse();
-
     @Getter
     private Socket socket;
     @Getter
@@ -31,9 +29,11 @@ public class Client {
     private ObjectOutputStream outputStreamWriter;
     @Getter
     private String username;
-    @Getter @Setter
-    private String channelName;
-    @Getter @Setter
+    @Getter
+    @Setter
+    private String channelName; //TODO: przemyśl lepszy i łatwiejszy sposób na identyfikowanie kanałów
+    @Getter
+    @Setter
     private PrivateChannel privateChannel;
 
     public Client(Socket socket, String username) throws IOException {
@@ -48,48 +48,39 @@ public class Client {
         }
     }
 
-    public void sendRequest(Request request) { // dodałem thread, czy na pewno muszę...? Mam jeszcze maina przecież...
-    /*    new Thread(new Runnable() {
-            @Override*/
-        /*    public void run() {*/
-                try {
-                    //while (socket.isConnected()) {
-                        logger.log(Level.INFO, "Sending request: " + request);
-                        outputStreamWriter.writeObject(request);
-                        outputStreamWriter.flush();
-                        logger.log(Level.INFO, "request sent");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    close(socket, outputStreamWriter, inputStreamReader);
-                }
-      /*      }
-        }).start();*/
+    public void sendRequest(Request request) {
+        try {
+            logger.log(Level.INFO, "Sending request: " + request);
+            outputStreamWriter.writeObject(request);
+            outputStreamWriter.flush();
+            logger.log(Level.INFO, "request sent");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void listenForMessage() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (socket.isConnected()) {
-                    try {
-                        logger.log(Level.INFO, "Client is listening...");
-                        responseHandler.handleResponse((Response) inputStreamReader.readObject());// dostaje obiekt
-                        logger.log(Level.INFO, "Response has been handled by the Client");
-                    } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-               }
+        new Thread(() -> {
+            while (socket.isConnected()) {
+                try {
+                    logger.log(Level.INFO, "Client is listening...");
+                    responseHandler.handleResponse((Response) inputStreamReader.readObject());
+                    logger.log(Level.INFO, "Response has been handled by the Client");
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                    close(socket, outputStreamWriter, inputStreamReader);
+                }
             }
         }).start();
     }
 
-    public void close(Socket socket, ObjectOutputStream bufferedReader, ObjectInputStream bufferedWriter){//BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
+    public void close(Socket socket, ObjectOutputStream outputStream, ObjectInputStream inputStream) {
         try {
-            if (bufferedReader != null) {
-                bufferedReader.close();
+            if (outputStream != null) {
+                outputStream.close();
             }
-            if (bufferedWriter != null) {
-                bufferedWriter.close();
+            if (inputStream != null) {
+                inputStream.close();
             }
             if (socket != null) {
                 socket.close();

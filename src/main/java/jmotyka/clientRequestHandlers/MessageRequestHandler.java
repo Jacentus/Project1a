@@ -1,8 +1,8 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
-import jmotyka.chathistoryreaderandwriter.FileHistorySaver;
+import jmotyka.ClientHandlersManager;
+import jmotyka.chatHistoryReaderAndWriter.FileHistorySaver;
 import jmotyka.requests.MessageRequest;
 import jmotyka.requests.PrivateMessageRequest;
 import jmotyka.requests.PublicMessageRequest;
@@ -17,8 +17,8 @@ public class MessageRequestHandler extends RequestHandler{
 
     private MessageRequest request;
 
-    public MessageRequestHandler(ClientHandlers clientHandlers, ClientHandler clientHandler, MessageRequest request) {
-        super(clientHandlers, clientHandler);
+    public MessageRequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler, MessageRequest request) {
+        super(clientHandlersManager, clientHandler);
         this.request = request;
     }
 
@@ -33,7 +33,7 @@ public class MessageRequestHandler extends RequestHandler{
             FileHistorySaver.saveToCache(publicMessageRequest);
 
             logger.log(Level.INFO, "msg saved to history!");
-            List<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(clientHandler.getChannelName());
+            List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPublicChannels().get(clientHandler.getChannelName());
             for (ClientHandler client : addressees) {
                 if(request.getUserName() != client.getClientUsername()) {
                     broadcast(client, messageResponse);
@@ -49,9 +49,9 @@ public class MessageRequestHandler extends RequestHandler{
            FileHistorySaver.saveToCache(privateMessageRequest);
 
             logger.log(Level.INFO, "msg saved to history!");
-            List<ClientHandler> addressees = ClientHandlers.getMapOfPrivateRooms().get(clientHandler.getPrivateChannel());
+            List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPrivateChannels().get(clientHandler.getPrivateChannel());
             for (ClientHandler client : addressees) {
-                if(request.getUserName() != client.getClientUsername()) { // próba uniknięcia dublowania się wiadomości
+                if(request.getUserName() != client.getClientUsername()) {
                     broadcast(client, messageResponse);
                     logger.log(Level.INFO, "Message sent to " + client.getClientUsername());
                 }

@@ -1,7 +1,5 @@
 package jmotyka.GUI;
 
-import jmotyka.requests.SendFileRequest;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,18 +12,14 @@ public class FileConverter {
 
     public byte[] transformIntoBytes(File file) {
         byte[] byteFile = new byte[0];
-        logger.log(Level.INFO, "Inside transform method form GUI...");
+        logger.log(Level.INFO, "Preparing file to be send...");
         try {
             byteFile = Files.readAllBytes(file.toPath());
         } catch (IOException e) {
-            logger.log(Level.INFO, "EXCEPTION READING FILE !!!");
-            System.out.println("exception when transforming file into bytes");
+            logger.log(Level.SEVERE, "Reading file failed!");
             e.printStackTrace();
         }
-        //SendFileRequest sendFileRequest = new SendFileRequest(userName, channelName, byteFile);
-        return byteFile; //sendFileRequest;
+        return byteFile;
     }
-
-
 
 }

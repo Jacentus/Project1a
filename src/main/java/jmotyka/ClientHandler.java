@@ -17,71 +17,67 @@ import java.util.logging.Logger;
 public class ClientHandler implements Runnable {
 
     @Getter
-    private final ClientHandlers clientHandlers;
+    private final ClientHandlersManager clientHandlersManager;
     @Getter
     private Socket socket;
-
-    @Getter @Setter
+    @Getter
     private ObjectInputStream objectInputStream;
-    @Getter @Setter
+    @Getter
     private ObjectOutputStream objectOutputStream;
-
-    @Getter @Setter
-    private String clientUsername;
-    @Getter @Setter
+    @Getter
+    @Setter
+    private String clientUsername; //TODO: zastanowić sie, czy tego nie ugenerycznić w jakiś sposób
+    @Getter
+    @Setter
     private String channelName;
-
-    @Getter @Setter
-    private PrivateChannel privateChannel; // to identify private channel in new map. Czy ja tego w ogóle używam?
-
+    @Getter
+    @Setter
+    private PrivateChannel privateChannel;
     private RequestHandlersFactory requestHandlersFactory;
+    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
-    private final Logger logger = Logger.getLogger(getClass().getName()); // ukryć pod interfejsem
-
-    public ClientHandler(Socket socket, ClientHandlers clientHandlers) throws IOException {
-        this.clientHandlers = clientHandlers;
+    public ClientHandler(Socket socket, ClientHandlersManager clientHandlersManager) throws IOException {
+        this.clientHandlersManager = clientHandlersManager;
         try {
             this.socket = socket;
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             this.objectInputStream = new ObjectInputStream(socket.getInputStream());
-            this.requestHandlersFactory = new RequestHandlersFactory(this, clientHandlers);
+            this.requestHandlersFactory = new RequestHandlersFactory(this, clientHandlersManager);
         } catch (IOException e) {
-            //close(socket, bufferedReader, bufferedWriter);
+            logger.log(Level.INFO, "ClientHandler failed to start...");
+            clientHandlersManager.remove(this); //TODO: ugenerycznić tę medotę. W tej chwili działa tylko dla prywatnych kanałów...
+            Server.closeSocket(socket);
+            closeStreams(objectInputStream, objectOutputStream); // TODO: zastanowic się, czy nie dac tego na np. shutdownhook
         }
     }
 
     @Override
     public void run() {
-        while (socket.isConnected()) { // DODAŁEM PĘTLĘ..
+        while (socket.isConnected()) {
             try {
                 logger.log(Level.INFO, "client handler waiting for requests...");
-
-                Request request = ((Request)objectInputStream.readObject()); // tu gmeram
+                Request request = ((Request) objectInputStream.readObject());
                 RequestHandler requestHandler = requestHandlersFactory.getRequestHandler(request);
                 requestHandler.processRequest();
-
                 logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
+                logger.log(Level.INFO, "Error when handling Client's requests. Closing...");
+                clientHandlersManager.remove(this);
                 e.printStackTrace();
-                //close(socket, bufferedReader, bufferedWriter);
-                //break;
-           }
+                closeStreams(objectInputStream, objectOutputStream);
+                Server.closeSocket(socket);
+                break;
+            }
         }
     }
 
-    // to chyba będzie niepotrzebne
-
-    public void close(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter){
-        clientHandlers.remove(this);
-        try{
-            if(bufferedReader !=null){
-                bufferedReader.close();
+    public static <E extends InputStream, T extends OutputStream> void closeStreams(E inputStream, T outputStream) {
+        try {
+            if (outputStream != null) {
+                outputStream.close();
             }
-            if (bufferedWriter != null){
-                bufferedWriter.close();
-            }
-            if (socket != null){
-                socket.close();
+            if (inputStream != null) {
+                inputStream.close();
             }
         } catch (IOException e) {
             e.printStackTrace();

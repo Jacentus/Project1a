@@ -1,35 +1,42 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
-import jmotyka.requests.RemoveFromChannelRequest;
+import jmotyka.ClientHandlersManager;
+import jmotyka.requests.RemoveFromPublicChannelRequest;
 import jmotyka.responses.MessageResponse;
-import jmotyka.responses.PrivateMessageResponse;
 import jmotyka.responses.PublicMessageResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class RemoveFromChannelRequestHandler extends RequestHandler{
+public class RemoveFromPublicChannelRequestHandler extends RequestHandler{
 
-    private RemoveFromChannelRequest request;
+    private RemoveFromPublicChannelRequest request;
 
-    public RemoveFromChannelRequestHandler(ClientHandlers clientHandlers, ClientHandler clientHandler, RemoveFromChannelRequest request) {
-        super(clientHandlers, clientHandler);
+    public RemoveFromPublicChannelRequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler, RemoveFromPublicChannelRequest request) {
+        super(clientHandlersManager, clientHandler);
         this.request = request;
     }
 
     @Override
     public void processRequest() {
         logger.log(Level.INFO, "Handling removing from channel request...!");
-        clientHandlers.remove(clientHandler);
+
+        lock.writeLock().lock();
+        clientHandlersManager.remove(clientHandler);
+        lock.writeLock().unlock();
+
         MessageResponse messageResponse = new PublicMessageResponse("SERVER: " + request.getUserName() ,request.getChannelName()," HAS LEFT THE CHANNEL!");
-        List<ClientHandler> addressees = ClientHandlers.getMapOfAllRooms().get(((RemoveFromChannelRequest) request).getChannelName());
+
+        lock.readLock().lock();
+        List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPublicChannels().get(request.getChannelName());
+        lock.readLock().unlock();
+
         for (ClientHandler client : addressees) {
             broadcast(client, messageResponse);
             logger.log(Level.INFO, "Message sent to " + client.getClientUsername());
         }
         logger.log(Level.INFO, "handling request to remove from channel has finished...!");
     }
+
 }

@@ -1,7 +1,7 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
+import jmotyka.ClientHandlersManager;
 import jmotyka.responses.ErrorResponse;
 import jmotyka.responses.GetAllChannelsResponse;
 
@@ -10,16 +10,16 @@ import java.util.List;
 
 public class GetAllChannelsRequestHandler extends RequestHandler {
 
-    public GetAllChannelsRequestHandler(ClientHandlers clientHandlers, ClientHandler clientHandler) {
-        super(clientHandlers, clientHandler);
+    public GetAllChannelsRequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler) {
+        super(clientHandlersManager, clientHandler);
     }
 
     @Override
     public void processRequest() {
         List<String> channelNames = new ArrayList<>();
-        ClientHandlers.getMapOfAllRooms().forEach((k, v) -> {
-            channelNames.add(k);
-        });
+        lock.readLock().lock();
+        ClientHandlersManager.getMapOfAllPublicChannels().forEach((k, v) -> channelNames.add(k));
+        lock.readLock().unlock();
         GetAllChannelsResponse getAllChannelsResponse = new GetAllChannelsResponse(channelNames);
         if (getAllChannelsResponse.getAllChannelsNames() != null) {
             broadcast(clientHandler, getAllChannelsResponse);

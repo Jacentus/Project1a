@@ -1,10 +1,9 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
-import jmotyka.chathistoryreaderandwriter.FileHistoryReader;
+import jmotyka.ClientHandlersManager;
+import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
 import jmotyka.exceptions.NoAccessToChatHistoryException;
-import jmotyka.requests.GetChannelHistoryRequest;
 import jmotyka.requests.GetPublicChannelHistoryRequest;
 import jmotyka.requests.MessageRequest;
 import jmotyka.responses.ErrorResponse;
@@ -19,8 +18,8 @@ public class GetPublicChannelHistoryRequestHandler extends GetChatHistoryRequest
     @Getter
     private GetPublicChannelHistoryRequest request;
 
-    public GetPublicChannelHistoryRequestHandler(ClientHandlers clientHandlers, ClientHandler clientHandler, GetPublicChannelHistoryRequest request) {
-        super(clientHandlers, clientHandler);
+    public GetPublicChannelHistoryRequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler, GetPublicChannelHistoryRequest request) {
+        super(clientHandlersManager, clientHandler);
         this.request = request;
     }
 

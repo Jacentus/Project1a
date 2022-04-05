@@ -1,18 +1,18 @@
 package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlers;
+import jmotyka.ClientHandlersManager;
 import jmotyka.requests.*;
 import lombok.extern.java.Log;
 
 @Log
 public class RequestHandlersFactory {
 
-    private final ClientHandlers clientHandlers;
+    private final ClientHandlersManager clientHandlersManager;
     private final ClientHandler clientHandler;
 
-    public RequestHandlersFactory(ClientHandler clientHandler, ClientHandlers clientHandlers) {
-        this.clientHandlers = clientHandlers;
+    public RequestHandlersFactory(ClientHandler clientHandler, ClientHandlersManager clientHandlersManager) {
+        this.clientHandlersManager = clientHandlersManager;
         this.clientHandler = clientHandler;
     }
 
@@ -21,34 +21,37 @@ public class RequestHandlersFactory {
             clientHandler.setClientUsername(request.getUserName());
         }
         if (request instanceof GetAllChannelsRequest) {
-            return new GetAllChannelsRequestHandler(clientHandlers, clientHandler);
+            return new GetAllChannelsRequestHandler(clientHandlersManager, clientHandler);
         }
         if (request instanceof JoinGroupChatRequest){
-            return new JoinGroupChatRequestHandler(clientHandlers, clientHandler, (JoinGroupChatRequest) request);
+            return new JoinGroupChatRequestHandler(clientHandlersManager, clientHandler, (JoinGroupChatRequest) request);
         }
         if (request instanceof MessageRequest){
-            return new MessageRequestHandler(clientHandlers, clientHandler, (MessageRequest) request);
+            return new MessageRequestHandler(clientHandlersManager, clientHandler, (MessageRequest) request);
         }
-        if (request instanceof RemoveFromChannelRequest){
-            return new RemoveFromChannelRequestHandler(clientHandlers, clientHandler, (RemoveFromChannelRequest) request);
+        if (request instanceof RemoveFromPublicChannelRequest){
+            return new RemoveFromPublicChannelRequestHandler(clientHandlersManager, clientHandler, (RemoveFromPublicChannelRequest) request);
+        }
+        if (request instanceof RemoveFromPrivateChannelRequest) {
+            return new RemoveFromPrivateChannelRequestHandler(clientHandlersManager, clientHandler, (RemoveFromPrivateChannelRequest) request);
         }
         if (request instanceof GetPrivateChannelHistoryRequest){
-            return new GetPrivateChannelHistoryRequestHandler(clientHandlers, clientHandler, (GetPrivateChannelHistoryRequest) request);
+            return new GetPrivateChannelHistoryRequestHandler(clientHandlersManager, clientHandler, (GetPrivateChannelHistoryRequest) request);
         }
         if (request instanceof GetPublicChannelHistoryRequest){
-            return new GetPublicChannelHistoryRequestHandler(clientHandlers, clientHandler, (GetPublicChannelHistoryRequest) request);
+            return new GetPublicChannelHistoryRequestHandler(clientHandlersManager, clientHandler, (GetPublicChannelHistoryRequest) request);
         }
         if (request instanceof SendFilePrivatelyRequest){
-            return new SendFilePrivatelyRequestHandler(clientHandlers, clientHandler, (SendFileRequest) request);
+            return new SendFilePrivatelyRequestHandler(clientHandlersManager, clientHandler, (SendFileRequest) request);
         }
         if (request instanceof SendFilePubliclyRequest){
-            return new SendFilePubliclyRequestHandler(clientHandlers, clientHandler, (SendFileRequest) request);
+            return new SendFilePubliclyRequestHandler(clientHandlersManager, clientHandler, (SendFileRequest) request);
         }
         if (request instanceof CreatePrivateChatRequest) {
-            return new CreatePrivateChatRequestHandler(clientHandlers, clientHandler, (CreatePrivateChatRequest) request);
+            return new CreatePrivateChatRequestHandler(clientHandlersManager, clientHandler, (CreatePrivateChatRequest) request);
         }
         if (request instanceof JoinPrivateChatRequest) {
-            return new JoinPrivateChatRequestHandler(clientHandlers, clientHandler, (JoinPrivateChatRequest) request);
+            return new JoinPrivateChatRequestHandler(clientHandlersManager, clientHandler, (JoinPrivateChatRequest) request);
         }
         else return null;
     }
