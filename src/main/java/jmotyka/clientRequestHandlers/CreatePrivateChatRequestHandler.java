@@ -41,8 +41,8 @@ public class CreatePrivateChatRequestHandler extends RequestHandler {
             if (channel.equals(request.getPrivateChannel())) {
                 logger.log(Level.INFO, "a matching private channel has been found");
                 exists = true;
-                }
             }
+        }
         return exists;
     }
 

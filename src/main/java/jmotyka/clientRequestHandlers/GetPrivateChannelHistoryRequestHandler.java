@@ -26,7 +26,7 @@ public class GetPrivateChannelHistoryRequestHandler extends GetChatHistoryReques
         logger.log(Level.INFO, "Trying to get private channel history...");
         FileHistoryReader reader = new FileHistoryReader();
         List<MessageRequest> channelHistory = null;
-        try{
+        try {
             channelHistory = reader.readFromCache(request.getUserName(), request.getChannel());
             GetChatHistoryResponse response = new GetChatHistoryResponse(channelHistory);
             broadcast(clientHandler, response);
@@ -36,8 +36,6 @@ public class GetPrivateChannelHistoryRequestHandler extends GetChatHistoryReques
             broadcast(clientHandler, new ErrorResponse(error));
         }
     }
-
-
 
 }
 
