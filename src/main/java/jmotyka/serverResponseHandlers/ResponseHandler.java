@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego na osobne klasy i zrobić fabryki
+public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego na osobne klasy lub nie powielić schematy z requestów
 
     private Client client;
 
@@ -79,7 +79,13 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
             }
         }
         if (response instanceof ErrorResponse) {
-            System.out.println("ERROR || " + ((ErrorResponse) response).getMessage());
+            client.getLock().getServerResponseLock().lock();
+            try {
+                System.out.println("ERROR || " + ((ErrorResponse) response).getMessage());
+                client.getLock().getResponseHandled().signal();
+            } finally {
+                client.getLock().getServerResponseLock().unlock();
+            }
         }
         if (response instanceof SendFileResponse) {
             String filePath = "D:\\RECEIVED_FILES\\" + ((SendFileResponse) response).getFileName();

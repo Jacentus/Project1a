@@ -8,8 +8,8 @@ public class GetPrivateChannelHistoryRequest extends GetChannelHistoryRequest {
     @Getter
     private PrivateChannel channel;
 
-    public GetPrivateChannelHistoryRequest(String userName, PrivateChannel channel) {
-        super(userName);
+    public GetPrivateChannelHistoryRequest(String userName, RequestType requestType, PrivateChannel channel) {
+        super(userName, requestType);
         this.channel = channel;
     }
 

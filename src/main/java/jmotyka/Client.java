@@ -21,11 +21,11 @@ public class Client {
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
     private final ClientLockForServerResponse lock = new ClientLockForServerResponse();
-    @Getter
+    //@Getter
     private Socket socket;
-    @Getter
+    //@Getter
     private ObjectInputStream inputStreamReader;
-    @Getter
+    //@Getter
     private ObjectOutputStream outputStreamWriter;
     @Getter
     private String username;

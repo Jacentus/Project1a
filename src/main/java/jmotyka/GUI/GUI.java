@@ -40,7 +40,7 @@ public class GUI {
                 case "1":
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new GetAllChannelsRequest(client.getUsername()));
+                        client.sendRequest(new GetAllChannelsRequest(client.getUsername(), Request.RequestType.GET_ALL_CHANNELS));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
@@ -52,14 +52,14 @@ public class GUI {
                     client.setChannelName(channelName);
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new JoinGroupChatRequest(client.getUsername(), client.getChannelName()));
+                        client.sendRequest(new JoinPublicChannelRequest(client.getUsername(), Request.RequestType.JOIN_PUBLIC_CHANNEL, client.getChannelName()));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
                     ChatBox publicChatBox = new PublicChatBox(scanner, fileConverter, client);
                     publicChatBox.launchChatBox();
-                    client.sendRequest(new RemoveFromPublicChannelRequest(client.getUsername(), client.getChannelName()));
+                    client.sendRequest(new RemoveFromPublicChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PUBLIC_CHANNEL, client.getChannelName()));
                     client.setChannelName(null);
                     break;
                 case "3":
@@ -80,7 +80,7 @@ public class GUI {
                     client.setPrivateChannel(privateChannel);
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new CreatePrivateChatRequest(client.getUsername(), client.getPrivateChannel()));
+                        client.sendRequest(new CreatePrivateChannelRequest(client.getUsername(), Request.RequestType.CREATE_NEW_PRIVATE_CHANNEL, client.getPrivateChannel()));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
@@ -89,7 +89,7 @@ public class GUI {
                     if (client.getPrivateChannel().getClientPermittedToChat()) {
                         ChatBox creatorChatBox = new PrivateChatBox(scanner, fileConverter, client);
                         creatorChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), client.getPrivateChannel()));
+                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PRIVATE_CHANNEL, client.getPrivateChannel()));
                     }
                     client.setPrivateChannel(null);
                     break;
@@ -99,7 +99,7 @@ public class GUI {
                     client.setPrivateChannel(new PrivateChannel(privateChannelName));
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new JoinPrivateChatRequest(client.getUsername(), client.getPrivateChannel()));
+                        client.sendRequest(new JoinPrivateChannelRequest(client.getUsername(), Request.RequestType.JOIN_PRIVATE_CHANNEL, client.getPrivateChannel()));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
@@ -108,7 +108,7 @@ public class GUI {
                     if (client.getPrivateChannel().getClientPermittedToChat()) {
                         ChatBox joinerChatBox = new PrivateChatBox(scanner, fileConverter, client);
                         joinerChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), client.getPrivateChannel()));
+                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PRIVATE_CHANNEL, client.getPrivateChannel()));
                     }
                     client.setPrivateChannel(null);
                     break;
@@ -122,7 +122,7 @@ public class GUI {
                             PrivateChannel historicChannel = new PrivateChannel(historicPrivateChannelName);
                             client.getLock().getServerResponseLock().lock();
                             try {
-                                client.sendRequest(new GetPrivateChannelHistoryRequest(client.getUsername(), historicChannel));
+                                client.sendRequest(new GetPrivateChannelHistoryRequest(client.getUsername(), Request.RequestType.GET_PRIVATE_CHANNEL_HISTORY, historicChannel));
                                 client.getLock().getResponseHandled().await();
                             } finally {
                                 client.getLock().getServerResponseLock().unlock();
@@ -133,7 +133,7 @@ public class GUI {
                             String historicPublicChannelName = scanner.nextLine();
                             client.getLock().getServerResponseLock().lock();
                             try {
-                                client.sendRequest(new GetPublicChannelHistoryRequest(client.getUsername(), historicPublicChannelName));
+                                client.sendRequest(new GetPublicChannelHistoryRequest(client.getUsername(), Request.RequestType.GET_PUBLIC_CHANNEL_HISTORY, historicPublicChannelName));
                                 client.getLock().getResponseHandled().await();
                             } finally {
                                 client.getLock().getServerResponseLock().unlock();

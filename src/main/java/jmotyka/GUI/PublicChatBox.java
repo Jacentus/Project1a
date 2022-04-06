@@ -3,6 +3,7 @@ package jmotyka.GUI;
 import jmotyka.Client;
 import jmotyka.requests.MessageRequest;
 import jmotyka.requests.PublicMessageRequest;
+import jmotyka.requests.Request;
 import jmotyka.requests.SendFilePubliclyRequest;
 
 import java.io.File;
@@ -17,7 +18,7 @@ public class PublicChatBox extends ChatBox {
 
     @Override
     void sendMessage(String text) {
-        MessageRequest message = new PublicMessageRequest(client.getUsername(), client.getChannelName(), text);
+        MessageRequest message = new PublicMessageRequest(client.getUsername(), Request.RequestType.PUBLIC_MESSAGE, client.getChannelName(), text);
         client.sendRequest(message);
         logger.log(Level.INFO, "Message send");
     }
@@ -25,7 +26,7 @@ public class PublicChatBox extends ChatBox {
     @Override
     public void sendFile(File file) {
         byte[] bytes = fileConverter.transformIntoBytes(file);
-        SendFilePubliclyRequest request = new SendFilePubliclyRequest(client.getUsername(), file.getName(), bytes, client.getChannelName());
+        SendFilePubliclyRequest request = new SendFilePubliclyRequest(client.getUsername(), Request.RequestType.SEND_FILE_PUBLICLY, file.getName(), bytes, client.getChannelName());
         client.sendRequest(request);
         logger.log(Level.INFO, "File send");
     }

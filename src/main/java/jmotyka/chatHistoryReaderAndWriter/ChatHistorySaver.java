@@ -1,6 +1,8 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
-public interface ChatHistorySaver {
+public interface ChatHistorySaver { //todo: do poprawy
+
+/*    void saveToCache(Handleable request);*/
 
   //  <T extends Map> void saveHistoryToFile(File file, T map);
 

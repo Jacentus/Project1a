@@ -8,8 +8,8 @@ public class PrivateMessageRequest extends MessageRequest{
     @Getter
     private PrivateChannel channel;
 
-    public PrivateMessageRequest(String userName, PrivateChannel channel, String text) {
-        super(userName, text);
+    public PrivateMessageRequest(String userName, RequestType requestType, PrivateChannel channel, String text) {
+        super(userName, requestType, text);
         this.channel = channel;
     }
 

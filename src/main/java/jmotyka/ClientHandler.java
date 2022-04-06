@@ -1,11 +1,10 @@
 package jmotyka;
 
 import jmotyka.clientRequestHandlers.RequestHandler;
-import jmotyka.clientRequestHandlers.RequestHandlersFactory;
 import jmotyka.entities.PrivateChannel;
+import jmotyka.requests.HandleableRequest;
 import lombok.Getter;
 import lombok.Setter;
-import jmotyka.requests.Request;
 import lombok.extern.java.Log;
 
 import java.io.*;
@@ -33,16 +32,19 @@ public class ClientHandler implements Runnable {
     @Getter
     @Setter
     private PrivateChannel privateChannel;
-    private RequestHandlersFactory requestHandlersFactory;
+    private RequestHandler requestHandler;
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
     public ClientHandler(Socket socket, ClientHandlersManager clientHandlersManager) throws IOException {
+
+        // TODO: TWORZENIE USERA
+
         this.clientHandlersManager = clientHandlersManager;
         try {
             this.socket = socket;
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             this.objectInputStream = new ObjectInputStream(socket.getInputStream());
-            this.requestHandlersFactory = new RequestHandlersFactory(this, clientHandlersManager);
+            this.requestHandler = new RequestHandler(this.clientHandlersManager, this);
         } catch (IOException e) {
             logger.log(Level.INFO, "ClientHandler failed to start...");
             clientHandlersManager.remove(this); //TODO: ugenerycznić tę medotę. W tej chwili działa tylko dla prywatnych kanałów...
@@ -56,9 +58,8 @@ public class ClientHandler implements Runnable {
         while (socket.isConnected()) {
             try {
                 logger.log(Level.INFO, "client handler waiting for requests...");
-                Request request = ((Request) objectInputStream.readObject());
-                RequestHandler requestHandler = requestHandlersFactory.getRequestHandler(request);
-                requestHandler.processRequest();
+                HandleableRequest request = ((HandleableRequest) objectInputStream.readObject());
+                requestHandler.handleRequest(request);
                 logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
                 logger.log(Level.INFO, "Error when handling Client's requests. Closing...");

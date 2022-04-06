@@ -2,10 +2,6 @@ package jmotyka.requests;
 
 import lombok.Getter;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 public abstract class SendFileRequest extends Request {
 
     @Getter
@@ -13,8 +9,8 @@ public abstract class SendFileRequest extends Request {
     @Getter
     private String fileName;
 
-    public SendFileRequest(String userName, String fileName, byte[] byteFile) {
-        super(userName);
+    public SendFileRequest(String userName, RequestType requestType, String fileName, byte[] byteFile) {
+        super(userName, requestType);
         this.fileName = fileName;
         this.byteFile = byteFile;
     }

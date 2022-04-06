@@ -18,8 +18,6 @@ public class ChatHistory {
     @Getter
     private final File privateChatDatabase = new File("privateChatHistory.txt");
     @Getter
-    private final FileHistorySaver fileHistorySaver = new FileHistorySaver();
-    @Getter
     private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
     @Getter
     private Map<String, List<MessageRequest>> publicChatHistory;

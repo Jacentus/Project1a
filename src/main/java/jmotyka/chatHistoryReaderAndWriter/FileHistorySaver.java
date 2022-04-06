@@ -1,6 +1,7 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
 import jmotyka.ClientHandlersManager;
+import jmotyka.entities.ChatHistory;
 import jmotyka.requests.MessageRequest;
 import jmotyka.requests.PrivateMessageRequest;
 import jmotyka.requests.PublicMessageRequest;

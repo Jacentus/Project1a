@@ -1,6 +1,7 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
 import jmotyka.ClientHandlersManager;
+import jmotyka.entities.ChatHistory;
 import jmotyka.entities.PrivateChannel;
 import jmotyka.exceptions.NoAccessToChatHistoryException;
 import jmotyka.requests.MessageRequest;
@@ -24,7 +25,7 @@ public class FileHistoryReader implements ChatHistoryReader {
             List<MessageRequest> allMessagesFromChannel;
             allMessagesFromChannel = getMessagesFromChannel(channelName, ClientHandlersManager.getHistory().getPublicChatHistory());
             Boolean permittedToSeeHistory = validateUser(allMessagesFromChannel, userName);
-            if (permittedToSeeHistory == true) {
+            if (permittedToSeeHistory) {
                 return allMessagesFromChannel;
             } else throw new NoAccessToChatHistoryException("YOU ARE NOT ENTITLED TO VIEW THIS CHANNEL'S HISTORY");
         } finally {
@@ -83,8 +84,10 @@ public class FileHistoryReader implements ChatHistoryReader {
 
     public Boolean validateUser(Map<PrivateChannel, List<MessageRequest>>map, PrivateChannel privateChannel, String userName){
         Set<PrivateChannel> allPrivateChannels = map.keySet();
+        System.out.println(allPrivateChannels);
         Boolean isPermitted = false;
         for (PrivateChannel channel: allPrivateChannels) {
+            System.out.println("Iteruję. Kanał: " + channel.getChannelName());
             if (channel.equals(privateChannel)) {
                 logger.log(Level.INFO, "a matching private channel has been found: " + channel);
                 isPermitted = channel.getPermittedUsers().contains(userName);

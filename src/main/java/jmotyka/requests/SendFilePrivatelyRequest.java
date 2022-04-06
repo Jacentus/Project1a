@@ -8,8 +8,8 @@ public class SendFilePrivatelyRequest extends SendFileRequest {
     @Getter
     private PrivateChannel channel;
 
-    public SendFilePrivatelyRequest(String userName, String fileName, byte[] byteFile, PrivateChannel channel) {
-        super(userName, fileName, byteFile);
+    public SendFilePrivatelyRequest(String userName, RequestType requestType, String fileName, byte[] byteFile, PrivateChannel channel) {
+        super(userName, requestType, fileName, byteFile);
         this.channel = channel;
     }
 
