@@ -2,7 +2,6 @@ package jmotyka.GUI;
 
 import jmotyka.Client;
 import jmotyka.requests.MessageRequest;
-import jmotyka.requests.PrivateMessageRequest;
 import jmotyka.requests.Request;
 import jmotyka.requests.SendFilePrivatelyRequest;
 
@@ -18,17 +17,16 @@ public class PrivateChatBox extends ChatBox{
 
     @Override
     public void sendMessage(String text){
-        MessageRequest message = new PrivateMessageRequest(client.getUsername(), Request.RequestType.PRIVATE_MESSAGE, client.getPrivateChannel(), text);
-        logger.log(Level.INFO, "Addressees: " + client.getPrivateChannel().getPermittedUsers());
+        MessageRequest message = new MessageRequest(client.getUsername(), client.getChannelName(), Request.RequestType.MESSAGE, text);
         client.sendRequest(message);
-        logger.log(Level.INFO, "Private message has been send");
+        logger.log(Level.INFO, "Message has been send");
     }
 
     @Override
     public void sendFile(File file){
         byte[] bytes = fileConverter.transformIntoBytes(file);
-        SendFilePrivatelyRequest request = new SendFilePrivatelyRequest(client.getUsername(), Request.RequestType.SEND_FILE_PRIVATELY, file.getName(), bytes, client.getPrivateChannel());
-        client.sendRequest(request);
+        //SendFilePrivatelyRequest request = new SendFilePrivatelyRequest(client.getUsername(), Request.RequestType.SEND_FILE_PRIVATELY, file.getName(), bytes, client.getPrivateChannel());
+        //client.sendRequest(request);
         logger.log(Level.INFO, "File send privately");
     }
 

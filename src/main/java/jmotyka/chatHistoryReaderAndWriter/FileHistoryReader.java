@@ -2,7 +2,6 @@ package jmotyka.chatHistoryReaderAndWriter;
 
 import jmotyka.ClientHandlersManager;
 import jmotyka.entities.ChatHistory;
-import jmotyka.entities.PrivateChannel;
 import jmotyka.exceptions.NoAccessToChatHistoryException;
 import jmotyka.requests.MessageRequest;
 
@@ -33,7 +32,7 @@ public class FileHistoryReader implements ChatHistoryReader {
         }
     }
 
-    public List<MessageRequest> readFromCache(String userName, PrivateChannel privateChannel) throws NoAccessToChatHistoryException {
+/*    public List<MessageRequest> readFromCache(String userName, PrivateChannel privateChannel) throws NoAccessToChatHistoryException {
         try {
             logger.log(Level.INFO, String.format("reading chat history..."));
             lock.readLock().lock();
@@ -44,7 +43,7 @@ public class FileHistoryReader implements ChatHistoryReader {
         } finally {
             lock.readLock().unlock();
         }
-    }
+    }*/
 
     @Override
     public <K, V extends List> Map<K, V> readFromFile(File file) {
@@ -82,7 +81,7 @@ public class FileHistoryReader implements ChatHistoryReader {
         return permittedToSeeHistory;
     }
 
-    public Boolean validateUser(Map<PrivateChannel, List<MessageRequest>>map, PrivateChannel privateChannel, String userName){
+/*    public Boolean validateUser(Map<PrivateChannel, List<MessageRequest>>map, PrivateChannel privateChannel, String userName){
         Set<PrivateChannel> allPrivateChannels = map.keySet();
         System.out.println(allPrivateChannels);
         Boolean isPermitted = false;
@@ -96,7 +95,7 @@ public class FileHistoryReader implements ChatHistoryReader {
         }
         logger.log(Level.INFO, "no match has been found...");
         return isPermitted;
-    }
+    }*/
 
     public List<MessageRequest> getMessagesFromChannel(String key, Map<String, List<MessageRequest>> history) throws NoAccessToChatHistoryException {
         List<MessageRequest> messages;

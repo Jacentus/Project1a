@@ -1,7 +1,6 @@
 package jmotyka.GUI;
 
 import jmotyka.Client;
-import jmotyka.entities.PrivateChannel;
 import java.io.File;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -13,7 +12,6 @@ public abstract class ChatBox {
     protected Scanner scanner;
     protected FileConverter fileConverter;
     protected Client client;
-    protected PrivateChannel privateChannel;
 
     public ChatBox(Scanner scanner, FileConverter fileConverter, Client client) {
         this.scanner = scanner;

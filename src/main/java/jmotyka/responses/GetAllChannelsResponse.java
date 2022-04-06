@@ -10,8 +10,8 @@ public class GetAllChannelsResponse extends Response {
     @Getter @Setter
     List<String> allChannelsNames;
 
-    public GetAllChannelsResponse(List<String> keyList) {
-        this.allChannelsNames = keyList;
+    public GetAllChannelsResponse(ResponseType responseType, List<String> allChannelsNames) {
+        super(responseType);
+        this.allChannelsNames = allChannelsNames;
     }
-
 }

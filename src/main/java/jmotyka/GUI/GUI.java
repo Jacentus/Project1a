@@ -1,11 +1,11 @@
 package jmotyka.GUI;
 
 import jmotyka.Client;
-import jmotyka.entities.PrivateChannel;
 import jmotyka.requests.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GUI {
@@ -49,70 +49,63 @@ public class GUI {
                 case "2":
                     System.out.println("Type channel name: ");
                     String channelName = scanner.nextLine();
-                    client.setChannelName(channelName);
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new JoinPublicChannelRequest(client.getUsername(), Request.RequestType.JOIN_PUBLIC_CHANNEL, client.getChannelName()));
+                        client.sendRequest(new JoinPublicChannelRequest(client.getUsername(), Request.RequestType.JOIN_PUBLIC_CHANNEL, channelName));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
                     ChatBox publicChatBox = new PublicChatBox(scanner, fileConverter, client);
                     publicChatBox.launchChatBox();
-                    client.sendRequest(new RemoveFromPublicChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PUBLIC_CHANNEL, client.getChannelName()));
+                    client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
                     client.setChannelName(null);
                     break;
                 case "3":
                     System.out.println("Type channel name: ");
                     String newPrivateChannelName = scanner.nextLine();
-                    PrivateChannel privateChannel = new PrivateChannel(newPrivateChannelName);
                     System.out.println("Provide list of users you want to chat with, one by one.");
                     System.out.println("Type #DONE when finished: ");
                     String permittedUser = null;
-                    privateChannel.getPermittedUsers().add(client.getUsername());
+                    ArrayList<String> permittedUsers = new ArrayList<>();
+                    permittedUsers.add(client.getUsername());
                     while (true) {
                         permittedUser = scanner.nextLine();
                         if (permittedUser.equalsIgnoreCase("#DONE")) {
                             break;
                         }
-                        privateChannel.getPermittedUsers().add(permittedUser);
+                        permittedUsers.add(permittedUser);
                     }
-                    client.setPrivateChannel(privateChannel);
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new CreatePrivateChannelRequest(client.getUsername(), Request.RequestType.CREATE_NEW_PRIVATE_CHANNEL, client.getPrivateChannel()));
+                        client.sendRequest(new CreatePrivateChannelRequest(client.getUsername(), newPrivateChannelName, Request.RequestType.CREATE_NEW_PRIVATE_CHANNEL, true, permittedUsers));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
-                    System.out.println("Permitted: " + client.getPrivateChannel().getClientPermittedToChat());
-                    if (client.getPrivateChannel().getClientPermittedToChat()) {
+                    if (client.getIsPermittedToChat()) {
                         ChatBox creatorChatBox = new PrivateChatBox(scanner, fileConverter, client);
                         creatorChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PRIVATE_CHANNEL, client.getPrivateChannel()));
+                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
                     }
-                    client.setPrivateChannel(null);
                     break;
                 case "4":
                     System.out.println("Type channel name you want to join: ");
                     String privateChannelName = scanner.nextLine();
-                    client.setPrivateChannel(new PrivateChannel(privateChannelName));
                     client.getLock().getServerResponseLock().lock();
                     try {
-                        client.sendRequest(new JoinPrivateChannelRequest(client.getUsername(), Request.RequestType.JOIN_PRIVATE_CHANNEL, client.getPrivateChannel()));
+                        client.sendRequest(new JoinPrivateChannelRequest(client.getUsername(), Request.RequestType.JOIN_PRIVATE_CHANNEL, privateChannelName));
                         client.getLock().getResponseHandled().await();
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
-                    System.out.println("Permitted: " + client.getPrivateChannel().getClientPermittedToChat());
-                    if (client.getPrivateChannel().getClientPermittedToChat()) {
+                    if (client.getIsPermittedToChat()) {
                         ChatBox joinerChatBox = new PrivateChatBox(scanner, fileConverter, client);
                         joinerChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromPrivateChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_PRIVATE_CHANNEL, client.getPrivateChannel()));
+                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
                     }
-                    client.setPrivateChannel(null);
                     break;
-                case "5":
+ /*               case "5":
                     System.out.println("Private or public channel? [1] PRIVATE [2] PUBLIC");
                     String historyChoice = scanner.nextLine();
                     switch (historyChoice) {
@@ -143,9 +136,8 @@ public class GUI {
                             System.out.println("Invalid choice!");
                             break;
                     }
-                    break;
-                default:
-                    System.out.println("No such command! Try again");
+                    default:
+                    System.out.println("No such command! Try again");*/
             }
             choice = null;
         }

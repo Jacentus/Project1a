@@ -2,7 +2,6 @@ package jmotyka.GUI;
 
 import jmotyka.Client;
 import jmotyka.requests.MessageRequest;
-import jmotyka.requests.PublicMessageRequest;
 import jmotyka.requests.Request;
 import jmotyka.requests.SendFilePubliclyRequest;
 
@@ -18,7 +17,7 @@ public class PublicChatBox extends ChatBox {
 
     @Override
     void sendMessage(String text) {
-        MessageRequest message = new PublicMessageRequest(client.getUsername(), Request.RequestType.PUBLIC_MESSAGE, client.getChannelName(), text);
+        MessageRequest message = new MessageRequest(client.getUsername(), client.getChannelName(), Request.RequestType.MESSAGE, text);
         client.sendRequest(message);
         logger.log(Level.INFO, "Message send");
     }

@@ -1,6 +1,5 @@
 package jmotyka;
 
-import jmotyka.entities.PrivateChannel;
 import jmotyka.requests.Request;
 import jmotyka.responses.Response;
 import jmotyka.serverResponseHandlers.ResponseHandler;
@@ -21,20 +20,18 @@ public class Client {
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
     private final ClientLockForServerResponse lock = new ClientLockForServerResponse();
-    //@Getter
     private Socket socket;
-    //@Getter
     private ObjectInputStream inputStreamReader;
-    //@Getter
     private ObjectOutputStream outputStreamWriter;
     @Getter
     private String username;
     @Getter
     @Setter
     private String channelName; //TODO: przemyśl lepszy i łatwiejszy sposób na identyfikowanie kanałów
+
     @Getter
     @Setter
-    private PrivateChannel privateChannel;
+    private Boolean isPermittedToChat;
 
     public Client(Socket socket, String username) throws IOException {
         try {

@@ -22,7 +22,7 @@ public class ChatHistory {
     @Getter
     private Map<String, List<MessageRequest>> publicChatHistory;
     @Getter
-    private Map<PrivateChannel, List<MessageRequest>> privateChatHistory;
+    private Map<String, List<MessageRequest>> privateChatHistory;
 
     public ChatHistory() {
         try {

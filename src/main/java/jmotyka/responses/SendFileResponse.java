@@ -2,6 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
+/*
 public class SendFileResponse extends Response{
 
     @Getter
@@ -18,3 +19,4 @@ public class SendFileResponse extends Response{
     }
 
 }
+*/

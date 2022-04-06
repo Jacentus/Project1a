@@ -1,10 +1,7 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
 import jmotyka.ClientHandlersManager;
-import jmotyka.entities.ChatHistory;
 import jmotyka.requests.MessageRequest;
-import jmotyka.requests.PrivateMessageRequest;
-import jmotyka.requests.PublicMessageRequest;
 import lombok.extern.java.Log;
 
 import java.util.ArrayList;
@@ -19,7 +16,7 @@ public class FileHistorySaver implements ChatHistorySaver {
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
     private static final Logger logger = Logger.getLogger(FileHistorySaver.class.getName()); // TODO: ukryć pod interfejsem
 
-    public static void saveToCache(PrivateMessageRequest message) {
+    /*public static void saveToCache(PrivateMessageRequest message) {
         try {
             lock.writeLock().lock();
             if (ClientHandlersManager.getHistory().getPrivateChatHistory().isEmpty()
@@ -35,9 +32,9 @@ public class FileHistorySaver implements ChatHistorySaver {
         } finally {
             lock.writeLock().unlock();
         }
-    }
+    }*/
 
-    public static void saveToCache(PublicMessageRequest message) {
+   /* public static void saveToCache(PublicMessageRequest message) {
         try {
             lock.writeLock().lock();
             if (ClientHandlersManager.getHistory().getPublicChatHistory().isEmpty()
@@ -53,6 +50,6 @@ public class FileHistorySaver implements ChatHistorySaver {
         } finally {
             lock.writeLock().unlock();
         }
-    }
+    }*/
 
 }

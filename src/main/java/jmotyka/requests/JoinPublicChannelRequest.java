@@ -11,4 +11,5 @@ public class JoinPublicChannelRequest extends Request {
         super(userName, requestType);
         this.channelName = channelName;
     }
+
 }

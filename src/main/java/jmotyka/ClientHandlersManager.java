@@ -1,7 +1,7 @@
 package jmotyka;
 
+import jmotyka.entities.Channel;
 import jmotyka.entities.ChatHistory;
-import jmotyka.entities.PrivateChannel;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
@@ -14,23 +14,34 @@ import java.util.logging.Logger;
 @Log
 public class ClientHandlersManager {
 
+    //@Getter
+    //private static final Map<String, List<ClientHandler>> mapOfAllPublicChannels = new HashMap<>();
+    //@Getter
+    //private static final Map<PrivateChannel, List<ClientHandler>> mapOfAllPrivateChannels = new HashMap<>();
     @Getter
-    private static final Map<String, List<ClientHandler>> mapOfAllPublicChannels = new HashMap<>();
-    @Getter
-    private static final Map<PrivateChannel, List<ClientHandler>> mapOfAllPrivateChannels = new HashMap<>();
+    private static final Map<String, Channel> mapOfAllChannels = new HashMap<>();
+
     @Getter
     private static ChatHistory history;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
     public ClientHandlersManager(ChatHistory history) {
-        mapOfAllPublicChannels.put("Warszawa", new ArrayList<>());
-        mapOfAllPublicChannels.put("Gdańsk", new ArrayList<>());
-        mapOfAllPublicChannels.put("Ogólny", new ArrayList<>());
+        //mapOfAllPublicChannels.put("Warszawa", new ArrayList<>());
+        //mapOfAllPublicChannels.put("Gdańsk", new ArrayList<>());
+        //mapOfAllPublicChannels.put("Ogólny", new ArrayList<>());
+        mapOfAllChannels.put("Ogólny", new Channel("Ogólny"));
+        mapOfAllChannels.put("Warszawa", new Channel("Warszawa"));
+        mapOfAllChannels.put("Gdańsk", new Channel("Gdańsk"));
         this.history = history;
     }
 
-    public void addClientToPublicChannel(ClientHandler clientHandler) {
+    public Boolean checkIfChannelAlreadyExists(String channelName){
+        if (mapOfAllChannels.containsKey(channelName)) {return true;
+        } else return false;
+    }
+
+/*    public void addClientToPublicChannel(ClientHandler clientHandler) {
         String channelName = clientHandler.getChannelName();
         lock.writeLock().lock();
         try {
@@ -100,6 +111,6 @@ public class ClientHandlersManager {
         } finally {
             lock.writeLock().unlock();
         }
-    }
+    }*/
 
 }

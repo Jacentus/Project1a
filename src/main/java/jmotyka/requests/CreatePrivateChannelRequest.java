@@ -1,16 +1,23 @@
 package jmotyka.requests;
 
-import jmotyka.entities.PrivateChannel;
 import lombok.Getter;
+
+import java.util.List;
 
 public class CreatePrivateChannelRequest extends Request {
 
     @Getter
-    private PrivateChannel privateChannel;
+    private String channelName;
+    @Getter
+    private Boolean isPrivate;
+    @Getter
+    private List<String> permittedUsers;
 
-    public CreatePrivateChannelRequest(String userName, RequestType requestType, PrivateChannel privateChannel) {
+    public CreatePrivateChannelRequest(String userName, String channelName, RequestType requestType, Boolean isPrivate, List<String> permittedUsers) {
         super(userName, requestType);
-        this.privateChannel = privateChannel;
+        this.channelName = channelName;
+        this.isPrivate = isPrivate;
+        this.permittedUsers = permittedUsers;
     }
     
 }

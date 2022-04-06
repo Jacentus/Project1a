@@ -1,7 +1,6 @@
 package jmotyka;
 
 import jmotyka.clientRequestHandlers.RequestHandler;
-import jmotyka.entities.PrivateChannel;
 import jmotyka.requests.HandleableRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,19 +25,17 @@ public class ClientHandler implements Runnable {
     @Getter
     @Setter
     private String clientUsername; //TODO: zastanowić sie, czy tego nie ugenerycznić w jakiś sposób
-    @Getter
+/*  @Getter
     @Setter
     private String channelName;
     @Getter
     @Setter
-    private PrivateChannel privateChannel;
+    private PrivateChannel privateChannel;*/
     private RequestHandler requestHandler;
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
     public ClientHandler(Socket socket, ClientHandlersManager clientHandlersManager) throws IOException {
-
-        // TODO: TWORZENIE USERA
-
+        // todo: atomic integer id dla usera?
         this.clientHandlersManager = clientHandlersManager;
         try {
             this.socket = socket;
@@ -47,7 +44,7 @@ public class ClientHandler implements Runnable {
             this.requestHandler = new RequestHandler(this.clientHandlersManager, this);
         } catch (IOException e) {
             logger.log(Level.INFO, "ClientHandler failed to start...");
-            clientHandlersManager.remove(this); //TODO: ugenerycznić tę medotę. W tej chwili działa tylko dla prywatnych kanałów...
+            //clientHandlersManager.remove(this); //TODO: usuń z listy kanałów gdy padnie
             Server.closeSocket(socket);
             closeStreams(objectInputStream, objectOutputStream); // TODO: zastanowic się, czy nie dac tego na np. shutdownhook
         }
@@ -63,7 +60,7 @@ public class ClientHandler implements Runnable {
                 logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
                 logger.log(Level.INFO, "Error when handling Client's requests. Closing...");
-                clientHandlersManager.remove(this);
+                //ClientHandlersManager.getMapOfAllChannels().remove(this); // todo: usunąć z listy kanału gdy padnie
                 e.printStackTrace();
                 closeStreams(objectInputStream, objectOutputStream);
                 Server.closeSocket(socket);

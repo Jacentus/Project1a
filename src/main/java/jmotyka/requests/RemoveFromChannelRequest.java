@@ -2,14 +2,13 @@ package jmotyka.requests;
 
 import lombok.Getter;
 
-public class RemoveFromPublicChannelRequest extends Request {
+public class RemoveFromChannelRequest extends Request{
 
     @Getter
     private String channelName;
 
-    public RemoveFromPublicChannelRequest(String userName, RequestType requestType, String channelName) {
+    public RemoveFromChannelRequest(String userName, RequestType requestType, String channelName) {
         super(userName, requestType);
         this.channelName = channelName;
     }
-
 }

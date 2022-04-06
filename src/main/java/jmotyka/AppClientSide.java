@@ -1,6 +1,8 @@
 package jmotyka;
 
 import jmotyka.GUI.GUI;
+import jmotyka.requests.IntroductionRequest;
+import jmotyka.requests.Request;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -13,6 +15,7 @@ public class AppClientSide {
         String username = gui.askForUsername();
         Client client = new Client(socket, username);
         client.listenForMessage();
+        client.sendRequest(new IntroductionRequest(username, Request.RequestType.INTRODUCTION));
         gui.setClient(client);
         gui.chooseFromMenu();
     }

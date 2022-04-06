@@ -1,16 +1,15 @@
 package jmotyka.requests;
 
-import jmotyka.entities.PrivateChannel;
 import lombok.Getter;
 
 public class JoinPrivateChannelRequest extends Request{
 
     @Getter
-    private PrivateChannel privateChannel;
+    private String channelName;
 
-    public JoinPrivateChannelRequest(String userName, RequestType requestType, PrivateChannel privateChannel) {
+    public JoinPrivateChannelRequest(String userName, RequestType requestType, String channelName) {
         super(userName, requestType);
-        this.privateChannel = privateChannel;
+        this.channelName = channelName;
     }
 
 }
