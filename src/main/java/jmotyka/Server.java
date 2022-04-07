@@ -22,7 +22,7 @@ public class Server {
     @Getter
     private final static int PORT = 10000; // TODO: do przemyślenia, czy nie wrzucić w config
     private final ServerSocket serverSocket;
-    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private final ClientHandlersManager clientHandlersManager;
     private final ExecutorService executor = Executors.newCachedThreadPool(); //newFixedThreadPool(50);
 

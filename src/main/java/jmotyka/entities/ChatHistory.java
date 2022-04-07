@@ -19,8 +19,8 @@ public class ChatHistory {
     public ChatHistory() {
         try {
             if(database.length() <= 0){
-                ClientHandlersManager.setMapOfAllChannels(new HashMap<>()); // czy aby napewno? Konstruktor w konstruktorze, może nie zadziałać. Czy na pewno cały channel jest serializowany?
-            } else { // w momencie gdy zdechnie serwer w bazie mogą zapisać się hanbdlery z zamkniętymi socketami, może to powodować kwas z wysyłaniem do zamklnietych socketów.
+                ClientHandlersManager.setMapOfAllChannels(new HashMap<>());
+            } else {
                 ClientHandlersManager.setMapOfAllChannels(fileHistoryReader.readFromFile(database));
             }
         } catch (Exception e){

@@ -1,27 +1,25 @@
-1. zdecydowałem się na hashMapę do przetrzymywania historii ze względu na stałą szybkość operacji get() czy put() w czasie O(1).
 
-2. zdecydowałem się na hashMapę do przetrzymywania obiektów klasy ClientHandler w hashMapie ze względu na możliwość identyfikacji
-   prywatnego kanału przez obiekt własnej klasy PrivateChannel, przetrzymującą listę nazw użytkowników (typu String) uprawnionych do
-   dostępu do danego prywatnego kanału. Ponadto stała szybkość operacji dodania i usunięcia użytkowników (obiekt klasy ClientHandler) z kanału zgodnie z pkt. 1 powyżej.
 
-3. zdecydowałem się na użycie Executor'a newCachedThreadPool() ze względu na fakt, że moja aplikacja najpewniej nie zostanie użyta w sposób
-   wymagający uruchomienia większej ilości wątków do obsługi Klientów :) Wydaje mi się, że wątek do obsługi Klienta, po jego rozłączeniu się od
-   Socket'u, pozostanie nieaktywny, ale niekoniecznie zostanie usunięty z pamięci. Ten rodzaj egzekutowa powinien zapenić, że nieużywany wątek zostanie użyty ponownie
+1. zdecydowałem się na hashMapę do przetrzymywania obiektów klasy ClientHandler w hashMapie ze względu na możliwość prostej identyfikacji
+   i dostania się do konkretnego kanału(pokoju) w czasie O(1). Klasa Channel przetrzymuje historię danego kanału, użytkowników uprawnionych do interakcji z kanałem.
+
+2. zdecydowałem się na użycie Executor'a newCachedThreadPool() ze względu na fakt, że moja aplikacja najpewniej nie zostanie użyta w sposób
+   wymagający uruchomienia większej ilości wątków do obsługi Klientów. Wydaje mi się, że wątek do obsługi Klienta, po jego rozłączeniu się od
+   Socket'u, i usunięciu z listy adresatów w pokojach pozostanie nieaktywny, ale niekoniecznie zostanie usunięty z pamięci. Ten rodzaj egzekutowa powinien zapenić, że nieużywany wątek zostanie użyty ponownie
    w celu oszczędzenia pamięci.
 
-4. zdecydowałem się na przesyłanie serializowanych obiektów ze względu na łatwość operowania na nich (w tym zapisu i odczytu z pliku) oraz próbę napisania aplikacji w sposób
+3. zdecydowałem się na przesyłanie serializowanych obiektów ze względu na łatwość operowania na nich (w tym zapisu i odczytu z pliku) oraz próbę napisania aplikacji w sposób
    jak nabardziej obiektowy. Dzięki temu w łatwy sposób zapisuję do/odczytuję z pliku (bazy) gotowe obiekty zawierające min. listy uprawnionych do czytania historii/dołączenia użytkowników,
-   czy wiadomości zawierające nazwy użytkowników zalogowanych na otwartym kanale.
+   czy wiadomości. Ponadto po "wstaniu" aplikacja zapamiętuje kanały, jakie istniały przy jej zamknieciu i pozwala na ponowne dołączenie do niej uprawnionych użytkowników.
 
-5. nie użyłem ConcurrentHashMap ani SynchronizedHashMap w celach edukacyjnych (zamiast tego użyty został ReadWriteLock)
+4. nie użyłem ConcurrentHashMap ani SynchronizedHashMap w celach edukacyjnych, zamiast tego użyty został ReadWriteLock.
 
-6. projektując aplikację jeszcze raz najpewniej użyłbym Enum aby określić, jakiego typu jest Request/Response i zminimalizować ilość różnych klas okreslających rodzaj zapytania.
-    Być może właściwym podejściem byłoby następnie użycie wzorca projektowego Budowniczy (ew. + dodatkowy kierownik) aby ułatwić Klientom tworzenie różniących się od siebie Request'ów.
+5. użyłem Enum dla identyfikowania odpowiedzi i zapytań do serwera.
 
-7. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition.
+6. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition.
 
-8. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania obu baz w cache opartych o hashMapy do odpowiednich plików.
-   Podobnie, przy uruchamianiu aplikacji jako jedna z pierwszych czynności wywoływana jest funkcja czytająca historię z pliku i zapisująca jej do odpowiednich kolekcji przechowywanych w pamięci podręcznej. Odczyt
+7. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania bazy w cache do pliku.
+   Podobnie, przy uruchamianiu aplikacji jako jedna z pierwszych czynności wywoływana jest funkcja czytająca historię z pliku i zapisująca ją do kolekcji przechowywanej w pamięci podręcznej. Odczyt
    Klientów oraz zapisywanie nowych wiadomości następuje na mapach już w pamięci podręcznej.
 
-9.
+8.
