@@ -1,11 +1,9 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
-public interface ChatHistorySaver { //todo: do poprawy
+import jmotyka.requests.MessageRequest;
 
-/*    void saveToCache(Handleable request);*/
+public interface ChatHistorySaver {
 
-  //  <T extends Map> void saveHistoryToFile(File file, T map);
-
-   // <T extends MessageRequest> void saveToCache(T request);
+    void save(MessageRequest request, String channelName);
 
 }

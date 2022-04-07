@@ -14,16 +14,11 @@ public class ShutDownHookSavingHistoryToFile implements Runnable{
 
     ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    ClientHandlersManager clientHandlersManager;
-
-    public ShutDownHookSavingHistoryToFile(ClientHandlersManager clientHandlersManager) {
-        this.clientHandlersManager = clientHandlersManager;
-    }
+    public ShutDownHookSavingHistoryToFile() {} // usunąłem instacje ClientHandlersManagera z konstruktora, wydawał się niepotrzbny bo odwołuję się do statycznego obiektu
 
     @Override
     public void run() {
-        saveToFile(clientHandlersManager.getHistory().getPrivateChatDatabase(), clientHandlersManager.getHistory().getPrivateChatHistory());
-        saveToFile(clientHandlersManager.getHistory().getPublicChatDatabase(), clientHandlersManager.getHistory().getPublicChatHistory());
+        saveToFile(ClientHandlersManager.getHistory().getDatabase(), ClientHandlersManager.getMapOfAllChannels());
     }
 
     public <T extends Map> void saveToFile(File file, T map) {

@@ -17,7 +17,7 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
         this.client = client;
     }
 
-    public void handleResponse(Response response){
+    public void handleResponse(Response response) {
         switch (response.getResponseType()) {
             case GET_ALL_CHANNELS_RESPONSE:
                 processResponse((GetAllChannelsResponse) response);
@@ -28,9 +28,9 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
             case ERROR:
                 processResponse((ErrorResponse) response);
                 break;
-/*            case GET_CHANNEL_HISTORY_RESPONSE:
+            case GET_CHANNEL_HISTORY_RESPONSE:
                 processResponse((GetChannelHistoryResponse) response);
-                break;*/
+                break;
             case JOIN_PRIVATE_CHANNEL_RESPONSE:
                 processResponse((JoinPrivateChannelResponse) response);
                 break;
@@ -40,9 +40,9 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
             case MESSAGE_RESPONSE:
                 processResponse((MessageResponse) response);
                 break;
-    /*        case SEND_FILE_RESPONSE:
+            case SEND_FILE_RESPONSE:
                 processResponse((SendFileResponse) response);
-                break;*/
+                break;
         }
     }
 
@@ -72,7 +72,7 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
         }
     }
 
-    public void processResponse(JoinPublicChannelResponse response){
+    public void processResponse(JoinPublicChannelResponse response) {
         client.getLock().getServerResponseLock().lock();
         try {
             System.out.println(String.format("You have joined %s channel!", (response).getChannelName()));
@@ -82,61 +82,62 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
         }
     }
 
-    public void processResponse(MessageResponse response){
+    public void processResponse(MessageResponse response) {
         System.out.println(response);
     }
 
-    public void processResponse(JoinPrivateChannelResponse response){
+    public void processResponse(JoinPrivateChannelResponse response) {
         client.getLock().getServerResponseLock().lock();
         try {
-            System.out.println(String.format("\nYou tried to join %s channel!",response.getChannelName()));
+            System.out.println(String.format("\nYou tried to join %s channel!", response.getChannelName()));
             client.setIsPermittedToChat(response.getIsPermitted());
+            if (!client.getIsPermittedToChat()) {
+                System.out.println("You are not allowed to join that channel");
+            }
             client.getLock().getResponseHandled().signal();
         } finally {
             client.getLock().getServerResponseLock().unlock();
         }
     }
 
-    public void processResponse(ErrorResponse response){
+    public void processResponse(ErrorResponse response) {
         client.getLock().getServerResponseLock().lock();
         try {
-            System.out.println("ERROR || " + ((ErrorResponse) response).getMessage());
+            System.out.println("ERROR || " + response.getMessage());
             client.getLock().getResponseHandled().signal();
         } finally {
             client.getLock().getServerResponseLock().unlock();
         }
     }
 
+    public void processResponse(SendFileResponse response) {
+        String filePath = "D:\\RECEIVED_FILES\\" + response.getFileName();
+        System.out.println("path: " + filePath);
+        File file = new File(filePath);
+        try {
+            OutputStream os = new FileOutputStream(file);
+            os.write((response).getFile());
+            os.close();
+            System.out.println("A FILE HAS BEEN SUCCESSFULLY RECEIVED FROM " + response.getUserName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-/*
-        if (response instanceof GetChannelHistoryResponse) {
-            client.getLock().getServerResponseLock().lock();
-            try {
-                GetChannelHistoryResponse getChannelHistoryResponse = (GetChannelHistoryResponse) response;
-                for (MessageRequest message : getChannelHistoryResponse.getChatHistory()) {
-                    System.out.println(message);
-                }
-                client.getLock().getResponseHandled().signal();
-            } finally {
-                client.getLock().getServerResponseLock().unlock();
+    public void processResponse(GetChannelHistoryResponse response) {
+        client.getLock().getServerResponseLock().lock();
+        try {
+            for (MessageRequest message : response.getChatHistory()) {
+                System.out.println(message);
             }
+            client.getLock().getResponseHandled().signal();
+        } finally {
+            client.getLock().getServerResponseLock().unlock();
         }
-        if (response instanceof SendFileResponse) {
-            String filePath = "D:\\RECEIVED_FILES\\" + ((SendFileResponse) response).getFileName();
-            System.out.println("path: " + filePath);
-            File file = new File(filePath);
-            try {
-                OutputStream os = new FileOutputStream(file);
-                os.write(((SendFileResponse) response).getFile());
-                os.close();
-                System.out.println("A FILE HAS BEEN SUCCESSFULLY RECEIVED FROM " + ((SendFileResponse) response).getUserName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
+    }
 
 }
+
 
 
 

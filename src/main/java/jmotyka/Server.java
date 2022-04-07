@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class Server {
 
     @Getter
-    private final static String HOST = "localhost"; // TODO: ograniczyć ilość wątków, egzekutor, pula wątków
+    private final static String HOST = "localhost";
     @Getter
     private final static int PORT = 10000; // TODO: do przemyślenia, czy nie wrzucić w config
     private final ServerSocket serverSocket;
@@ -33,7 +33,7 @@ public class Server {
 
     public void startServer() {
         logger.log(Level.INFO, "Server is listening on port: " + getPORT());
-        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownHookSavingHistoryToFile(clientHandlersManager)));
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownHookSavingHistoryToFile()));
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
@@ -44,7 +44,7 @@ public class Server {
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Server failed to start: " + e.getMessage());
             e.printStackTrace();
-            closeServerSocket();
+            closeSocket(serverSocket);
             logger.log(Level.SEVERE, "Thread executor shutting down...");
             executor.shutdown();
             try {
@@ -57,18 +57,7 @@ public class Server {
         }
     }
 
-    public void closeServerSocket() {
-        try {
-            if (serverSocket != null) {
-                logger.log(Level.INFO, "Closing server socket...");
-                serverSocket.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static <T extends Socket> void closeSocket(T socket) {
+    public static <T extends Closeable> void closeSocket(T socket) {
         try {
             if (socket != null) {
                 socket.close();

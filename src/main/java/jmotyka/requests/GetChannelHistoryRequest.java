@@ -1,9 +1,15 @@
 package jmotyka.requests;
 
-public abstract class GetChannelHistoryRequest extends Request {
+import lombok.Getter;
 
-    public GetChannelHistoryRequest(String userName, RequestType requestType) {
+public class GetChannelHistoryRequest extends Request {
+
+    @Getter
+    private String channelName;
+
+    public GetChannelHistoryRequest(String userName, String channelName, RequestType requestType) {
         super(userName, requestType);
+        this.channelName = channelName;
     }
 
 }

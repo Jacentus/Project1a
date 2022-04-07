@@ -2,7 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-/*
+
 public class SendFileResponse extends Response{
 
     @Getter
@@ -12,11 +12,12 @@ public class SendFileResponse extends Response{
     @Getter
     private String fileName;
 
-    public SendFileResponse(String userName, String fileName, byte[] file) {
+    public SendFileResponse(ResponseType responseType, String userName, String fileName, byte[] file) {
+        super(responseType);
         this.userName = userName;
         this.fileName = fileName;
         this.file = file;
     }
 
 }
-*/
+

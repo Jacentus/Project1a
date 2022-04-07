@@ -56,10 +56,10 @@ public class GUI {
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
-                    ChatBox publicChatBox = new PublicChatBox(scanner, fileConverter, client);
+                    ChatBox publicChatBox = new ChatBox(scanner, fileConverter, client, channelName);
                     publicChatBox.launchChatBox();
-                    client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
-                    client.setChannelName(null);
+                    client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, channelName));
+                    //client.setChannelName(null);
                     break;
                 case "3":
                     System.out.println("Type channel name: ");
@@ -84,9 +84,9 @@ public class GUI {
                         client.getLock().getServerResponseLock().unlock();
                     }
                     if (client.getIsPermittedToChat()) {
-                        ChatBox creatorChatBox = new PrivateChatBox(scanner, fileConverter, client);
-                        creatorChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
+                        ChatBox privateChatBox1 = new ChatBox(scanner, fileConverter, client, newPrivateChannelName);
+                        privateChatBox1.launchChatBox();
+                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, newPrivateChannelName));
                     }
                     break;
                 case "4":
@@ -100,44 +100,23 @@ public class GUI {
                         client.getLock().getServerResponseLock().unlock();
                     }
                     if (client.getIsPermittedToChat()) {
-                        ChatBox joinerChatBox = new PrivateChatBox(scanner, fileConverter, client);
+                        ChatBox joinerChatBox = new ChatBox(scanner, fileConverter, client, privateChannelName);
                         joinerChatBox.launchChatBox();
-                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, client.getChannelName()));
+                        client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, privateChannelName));
                     }
                     break;
- /*               case "5":
-                    System.out.println("Private or public channel? [1] PRIVATE [2] PUBLIC");
-                    String historyChoice = scanner.nextLine();
-                    switch (historyChoice) {
-                        case "1":
-                            System.out.println("Type channel name you wish get history from: ");
-                            String historicPrivateChannelName = scanner.nextLine();
-                            PrivateChannel historicChannel = new PrivateChannel(historicPrivateChannelName);
-                            client.getLock().getServerResponseLock().lock();
-                            try {
-                                client.sendRequest(new GetPrivateChannelHistoryRequest(client.getUsername(), Request.RequestType.GET_PRIVATE_CHANNEL_HISTORY, historicChannel));
-                                client.getLock().getResponseHandled().await();
-                            } finally {
-                                client.getLock().getServerResponseLock().unlock();
-                            }
-                            break;
-                        case "2":
-                            System.out.println("Type channel name you wish get history from: ");
-                            String historicPublicChannelName = scanner.nextLine();
-                            client.getLock().getServerResponseLock().lock();
-                            try {
-                                client.sendRequest(new GetPublicChannelHistoryRequest(client.getUsername(), Request.RequestType.GET_PUBLIC_CHANNEL_HISTORY, historicPublicChannelName));
-                                client.getLock().getResponseHandled().await();
-                            } finally {
-                                client.getLock().getServerResponseLock().unlock();
-                            }
-                            break;
-                        default:
-                            System.out.println("Invalid choice!");
-                            break;
+                case "5":
+                    System.out.println("Type name of channel you wish to get history from: ");
+                    String historicChannelName = scanner.nextLine();
+                    client.getLock().getServerResponseLock().lock();
+                    try {
+                        client.sendRequest(new GetChannelHistoryRequest(client.getUsername(), historicChannelName, Request.RequestType.GET_CHANNEL_HISTORY));
+                        client.getLock().getResponseHandled().await();
+                    } finally {
+                        client.getLock().getServerResponseLock().unlock();
                     }
-                    default:
-                    System.out.println("No such command! Try again");*/
+                //default:
+                    //System.out.println("No such command! Try again");
             }
             choice = null;
         }

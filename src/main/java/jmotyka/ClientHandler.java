@@ -1,13 +1,17 @@
 package jmotyka;
 
 import jmotyka.clientRequestHandlers.RequestHandler;
+import jmotyka.entities.Channel;
 import jmotyka.requests.HandleableRequest;
+import jmotyka.requests.RemoveFromChannelRequest;
+import jmotyka.requests.Request;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,12 +29,6 @@ public class ClientHandler implements Runnable {
     @Getter
     @Setter
     private String clientUsername; //TODO: zastanowić sie, czy tego nie ugenerycznić w jakiś sposób
-/*  @Getter
-    @Setter
-    private String channelName;
-    @Getter
-    @Setter
-    private PrivateChannel privateChannel;*/
     private RequestHandler requestHandler;
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
@@ -44,7 +42,6 @@ public class ClientHandler implements Runnable {
             this.requestHandler = new RequestHandler(this.clientHandlersManager, this);
         } catch (IOException e) {
             logger.log(Level.INFO, "ClientHandler failed to start...");
-            //clientHandlersManager.remove(this); //TODO: usuń z listy kanałów gdy padnie
             Server.closeSocket(socket);
             closeStreams(objectInputStream, objectOutputStream); // TODO: zastanowic się, czy nie dac tego na np. shutdownhook
         }
@@ -60,7 +57,7 @@ public class ClientHandler implements Runnable {
                 logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
                 logger.log(Level.INFO, "Error when handling Client's requests. Closing...");
-                //ClientHandlersManager.getMapOfAllChannels().remove(this); // todo: usunąć z listy kanału gdy padnie
+                killConnectionWithClient(ClientHandlersManager.getMapOfAllChannels(), this);
                 e.printStackTrace();
                 closeStreams(objectInputStream, objectOutputStream);
                 Server.closeSocket(socket);
@@ -79,6 +76,12 @@ public class ClientHandler implements Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void killConnectionWithClient(Map<String, Channel> allChannels, ClientHandler clientHandler){
+        for (Channel channel: allChannels.values()) {
+                channel.getUsersInChannel().remove(clientHandler);
         }
     }
 

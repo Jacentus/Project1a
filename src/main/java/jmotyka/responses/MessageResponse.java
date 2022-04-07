@@ -1,7 +1,6 @@
 package jmotyka.responses;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class MessageResponse extends Response {
 
@@ -21,7 +20,7 @@ public class MessageResponse extends Response {
 
     @Override
     public String toString() {
-        return "[" + username + " | " + channelName + "] " + text + '\'';
+        return "[" + username + " | " + channelName + "] " + text;
     }
 
 }

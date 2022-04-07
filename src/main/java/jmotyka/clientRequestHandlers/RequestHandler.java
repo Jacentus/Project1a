@@ -2,11 +2,14 @@ package jmotyka.clientRequestHandlers;
 
 import jmotyka.ClientHandler;
 import jmotyka.ClientHandlersManager;
+import jmotyka.chatHistoryReaderAndWriter.CacheHistorySaver;
+import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
+import jmotyka.chatHistoryReaderAndWriter.ChatHistorySaver;
 import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
-import jmotyka.chatHistoryReaderAndWriter.FileHistorySaver;
 import jmotyka.entities.Channel;
 import jmotyka.exceptions.NoAccesToChannelException;
 import jmotyka.exceptions.NoAccessToChatHistoryException;
+import jmotyka.exceptions.NoSuchChannelException;
 import jmotyka.requests.*;
 import jmotyka.responses.*;
 
@@ -22,7 +25,11 @@ public class RequestHandler {
 
     private final ClientHandlersManager clientHandlersManager;
     private final ClientHandler clientHandler;
+
     private ReadWriteLock lock = new ReentrantReadWriteLock();
+
+    private ChatHistorySaver historySaver = new CacheHistorySaver();
+    private ChatHistoryReader historyReader = new FileHistoryReader();
 
     protected static final Logger logger = Logger.getLogger(RequestHandler.class.getName()); // TODO: ukryć pod interfejsem
 
@@ -39,12 +46,9 @@ public class RequestHandler {
             case GET_ALL_CHANNELS:
                 processRequest((GetAllChannelsRequest) request);
                 break;
-/*            case GET_PUBLIC_CHANNEL_HISTORY:
-                processRequest((GetPublicChannelHistoryRequest) request);
+            case GET_CHANNEL_HISTORY:
+                processRequest((GetChannelHistoryRequest) request);
                 break;
-            case GET_PRIVATE_CHANNEL_HISTORY:
-                processRequest((GetPrivateChannelHistoryRequest) request);
-                break;*/
             case JOIN_PUBLIC_CHANNEL:
                 processRequest((JoinPublicChannelRequest) request);
                 break;
@@ -54,12 +58,9 @@ public class RequestHandler {
             case CREATE_NEW_PRIVATE_CHANNEL:
                 processRequest((CreatePrivateChannelRequest) request);
                 break;
- /*           case SEND_FILE_PUBLICLY:
-                processRequest((SendFilePubliclyRequest) request);
+            case SEND_FILE_REQUEST:
+                processRequest((SendFileRequest) request);
                 break;
-            case SEND_FILE_PRIVATELY:
-                processRequest((SendFilePrivatelyRequest) request);
-                break;*/
             case REMOVE_FROM_CHANNEL:
                 processRequest((RemoveFromChannelRequest) request);
                 break;
@@ -105,8 +106,6 @@ public class RequestHandler {
 
     public void processRequest(JoinPublicChannelRequest request) {
         logger.log(Level.INFO, "Joining to a public channel " + request.getChannelName());
-        lock.readLock().lock();
-        lock.writeLock().lock();
         if (ClientHandlersManager.getMapOfAllChannels().containsKey(request.getChannelName())) {
             try {
                 ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).addClientToChannel(clientHandler);
@@ -116,12 +115,9 @@ public class RequestHandler {
                 logger.log(Level.INFO, "Notifications has been send");
             } catch (NoAccesToChannelException exception) {
                 broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, exception.getMessage()));
-            } finally {
-                lock.readLock().unlock();
-                lock.writeLock().unlock();
             }
         } else {
-            lock.writeLock().lock();
+            lock.writeLock().lock(); //todo: upewnij się że to nie blokuje wątku
             try {
                 Channel newChannel = new Channel(request.getChannelName());
                 newChannel.getPermittedUsers().add(request.getUserName());
@@ -138,8 +134,7 @@ public class RequestHandler {
         logger.log(Level.INFO, "Handling message request...!");
         MessageResponse messageResponse = new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, request.getUserName(), request.getChannelName(), request.getText());
         logger.log(Level.INFO, "proceeding to save public msg to chat history......!");
-        // todo: do poprawki na interfejs
-        //FileHistorySaver.saveToCache(request); //todo: zapisywanie do pliku
+        historySaver.save(request, request.getChannelName()); //todo: zapisywanie do cache
         logger.log(Level.INFO, "msg saved to history!");
         ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).broadcast(clientHandler, messageResponse);
         logger.log(Level.INFO, "Messages broadcasted");
@@ -147,8 +142,6 @@ public class RequestHandler {
 
     public void processRequest(JoinPrivateChannelRequest request) {
         logger.log(Level.INFO, "Joining to a private chat " + request.getChannelName());
-        lock.readLock().lock();
-        lock.writeLock().lock();
         if (ClientHandlersManager.getMapOfAllChannels().containsKey(request.getChannelName())) {
             try {
                 ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).addClientToChannel(clientHandler);
@@ -157,9 +150,6 @@ public class RequestHandler {
                 logger.log(Level.INFO, "Notifications has been send");
             } catch (NoAccesToChannelException exception) {
                 broadcastToSender(clientHandler, new JoinPrivateChannelResponse(Response.ResponseType.JOIN_PRIVATE_CHANNEL_RESPONSE, false, request.getChannelName()));
-            } finally {
-                lock.readLock().unlock();
-                lock.writeLock().unlock();
             }
         } else {
             broadcastToSender(clientHandler, new JoinPrivateChannelResponse(Response.ResponseType.JOIN_PRIVATE_CHANNEL_RESPONSE, false, request.getChannelName()));
@@ -168,6 +158,8 @@ public class RequestHandler {
 
     public void processRequest(RemoveFromChannelRequest request) {
         logger.log(Level.INFO, "Handling removing from channel request...!");
+        logger.log(Level.INFO, "Removing " + request.getUserName() + " from " + request.getChannelName());
+        logger.log(Level.INFO, "Channel from my channel manager: " + ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()));
         ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).remove(clientHandler);
         ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName())
                 .broadcast(clientHandler, new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, "SERVER", clientHandler.getClientUsername(), "HAS LEFT THE CHANNEL"));
@@ -184,95 +176,25 @@ public class RequestHandler {
         }
     }
 
-
-/*    protected void processRequest(SendFilePubliclyRequest request) { //TODO: na pewno mogę to ugenerycznić
-        lock.readLock().lock();
-        List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPublicChannels().get(request.getChannel());
-        lock.readLock().unlock();
-        SendFileResponse sendFileResponse = new SendFileResponse(request.getUserName(), request.getFileName(), request.getByteFile());
-        for (ClientHandler client : addressees) { //TODO: TO chyba mógłbym zastąpić usunięciem danego adresata z listy, aby nie robić tylu ifów
-            if (request.getUserName() != client.getClientUsername()) {
-                broadcastToSender(client, sendFileResponse);
-                logger.log(Level.INFO, "File sent to " + client.getClientUsername());
-            }
-        }
-    }*/
-
-/*    protected void processRequest(SendFilePrivatelyRequest request) { //TODO: na pewno mogę to ugenerycznić
-        lock.readLock().lock();
-        List<ClientHandler> addressees = ClientHandlersManager.getMapOfAllPrivateChannels().get(request.getChannel());
-        lock.readLock().unlock();
-        SendFileResponse sendFileResponse = new SendFileResponse(request.getUserName(), request.getFileName(), request.getByteFile());
-        for (ClientHandler client : addressees) {
-            if (request.getUserName() != client.getClientUsername()) { //TODO: TO chyba mógłbym zastąpić usunięciem danego adresata z listy, aby nie robić tylu ifów
-                broadcastToSender(client, sendFileResponse);
-                logger.log(Level.INFO, "File sent to " + client.getClientUsername());
-            }
-        }
-    }*/
-
-/*    public void processRequest(GetPrivateChannelHistoryRequest request) {
-        logger.log(Level.INFO, "Trying to get private channel history...");
-        FileHistoryReader reader = new FileHistoryReader();
-        List<MessageRequest> channelHistory = null;
-        try {
-            channelHistory = reader.readFromCache(request.getUserName(), request.getChannel());
-            GetChannelHistoryResponse response = new GetChannelHistoryResponse(channelHistory);
-            broadcastToSender(clientHandler, response);
-        } catch (NoAccessToChatHistoryException e) {
-            e.printStackTrace();
-            String error = e.getMessage();
-            broadcastToSender(clientHandler, new ErrorResponse(error));
-        }
-    }*/
-
-/*    public void processRequest(GetPublicChannelHistoryRequest request) {
-        logger.log(Level.INFO, "Trying to get channel history...");
-        List<MessageRequest> channelHistory = null;
-        FileHistoryReader reader = new FileHistoryReader();
-        try {
-            channelHistory = reader.readFromCache(request.getUserName(), request.getChannel());
-            GetChannelHistoryResponse response = new GetChannelHistoryResponse(channelHistory);
-            broadcastToSender(clientHandler, response);
-        } catch (NoAccessToChatHistoryException e) {
-            e.printStackTrace();
-            String error = e.getMessage();
-            broadcastToSender(clientHandler, new ErrorResponse(error));
-        }
-    }*/
-//todo: przenieść gdzie indziej i zrobić statycznymi? A co z dostępem do pól z handlera?
-////////////////////////////////////////////////////// UTILS - MOVE TO SUBCLASS ////////////////////////////////////////////////////////////////////////////////////////
-
-/*    public Boolean privateChannelAlreadyExists(CreatePrivateChannelRequest request) {
-        lock.readLock().lock();
-        Set<PrivateChannel> allPrivateChannels = ClientHandlersManager.getMapOfAllPrivateChannels().keySet();
-        lock.readLock().unlock();
-        Boolean exists = false;
-        for (PrivateChannel channel : allPrivateChannels) {
-            if (channel.equals(request.getPrivateChannel())) {
-                logger.log(Level.INFO, "a matching private channel has been found");
-                exists = true;
-            }
-        }
-        return exists;
+    protected void processRequest(SendFileRequest request) {
+        SendFileResponse sendFileResponse = new SendFileResponse(Response.ResponseType.SEND_FILE_RESPONSE, request.getUserName(), request.getFileName(), request.getByteFile());
+        ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).broadcast(clientHandler, sendFileResponse);
+        logger.log(Level.INFO, "Finished distributing file");
     }
 
-    public PrivateChannel checkIfPermittedToJoin(JoinPrivateChannelRequest request) {
-        lock.readLock().lock();
-        Set<PrivateChannel> allPrivateChannels = ClientHandlersManager.getMapOfAllPrivateChannels().keySet();
-        lock.readLock().unlock();
-        Boolean isPermitted = false;
-        for (PrivateChannel channel : allPrivateChannels) {
-            if (channel.equals(request.getPrivateChannel())) {
-                logger.log(Level.INFO, "a matching private channel has been found");
-                if (channel.getPermittedUsers().contains(request.getUserName())) {
-                    logger.log(Level.INFO, "a matching user has been found");
-                    return channel;
-                }
-            }
+
+    public void processRequest(GetChannelHistoryRequest request) {
+        logger.log(Level.INFO, "Trying to get channel history...");
+        List<MessageRequest> channelHistory;
+        try {
+            channelHistory = historyReader.read(request.getUserName(), request.getChannelName());
+            GetChannelHistoryResponse response = new GetChannelHistoryResponse(Response.ResponseType.GET_CHANNEL_HISTORY_RESPONSE, channelHistory);
+            broadcastToSender(clientHandler, response);
+        } catch (NoAccessToChatHistoryException | NoSuchChannelException e) {
+            e.printStackTrace();
+            String error = e.getMessage();
+            broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, error));
         }
-        logger.log(Level.INFO, "no match has been found...");
-        return null;
-    }*/
+    }
 
 }

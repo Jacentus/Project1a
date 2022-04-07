@@ -8,6 +8,7 @@ import jmotyka.responses.Response;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,13 @@ public class Channel implements Serializable {
     @Getter
     private List<String> permittedUsers; // TODO: jeżeli czat jest prywatny, to dostęp do historii będą mieli tylko ci userzy. jeśli jest publiczny, to każdy user który dołączy będzie tu dodawany.
     @Getter
-    private List<ClientHandler> usersInChannel;
+    private transient List<ClientHandler> usersInChannel;
     @Getter
     private List<MessageRequest> channelHistory;   // TODO : czy na pewno?
     @Getter
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Logger logger = Logger.getLogger(getClass().getName());
+
+    private transient Logger logger = Logger.getLogger(getClass().getName());
 
     public Channel(String channelName) {
         this.channelName = channelName;
@@ -78,7 +80,7 @@ public class Channel implements Serializable {
         logger.log(Level.INFO, String.format("Removing %s from  %s channel", clientHandler.getClientUsername(), channelName));
         lock.writeLock().lock();
         try {
-            usersInChannel.remove(clientHandler.getClientUsername());
+            usersInChannel.remove(clientHandler);
             logger.log(Level.INFO, String.format("Client %s left %s channel", clientHandler.getClientUsername(), channelName));
         } finally {
             lock.writeLock().unlock();
@@ -86,17 +88,28 @@ public class Channel implements Serializable {
     }
 
     public void broadcast(ClientHandler clientHandler, Response response) { // TODO: nie jestem pewien czy nadaję do dobrych socketów
-        for (ClientHandler client : usersInChannel) {
-            if (!client.getClientUsername().equals(clientHandler.getClientUsername())) {
-                try {
-                    client.getObjectOutputStream().writeObject(response);
-                    client.getObjectOutputStream().flush();
-                    logger.log(Level.INFO, "MESSAGE HAS BEEN BROADCASTED");
-                } catch (IOException exception) {
-                    exception.printStackTrace();
+        lock.readLock().lock();
+        try {
+            for (ClientHandler client : usersInChannel) {
+                if (!client.getClientUsername().equals(clientHandler.getClientUsername())) {
+                    try {
+                        client.getObjectOutputStream().writeObject(response);
+                        client.getObjectOutputStream().flush();
+                        logger.log(Level.INFO, "MESSAGE HAS BEEN BROADCASTED TO " + client.getClientUsername());
+                    } catch (IOException exception) {
+                        exception.printStackTrace();
+                    }
                 }
             }
+        } finally {
+            lock.readLock().unlock();
         }
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+        in.defaultReadObject();
+        usersInChannel = new ArrayList<>();
+        logger = Logger.getLogger(getClass().getName());
     }
 
     @Override
