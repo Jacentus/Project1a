@@ -16,13 +16,15 @@ public class ClientHandlersManager {
 
     @Getter
     @Setter
-    private Map<String, Channel> mapOfAllChannels = new HashMap();
-    private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
+    private Map<String, Channel> mapOfAllChannels;
+    private ChatHistoryReader fileHistoryReader;
     @Getter
     private static final File database = new File("chatHistory.txt");
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
     public ClientHandlersManager() {
+        this.fileHistoryReader = new FileHistoryReader();
+        this.mapOfAllChannels = new HashMap();
         readHistory();
     }
 

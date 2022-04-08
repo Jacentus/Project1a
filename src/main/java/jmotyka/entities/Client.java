@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 @Log
 public class Client {
 
-    private final Logger logger = Logger.getLogger(getClass().getName());
+    //private final Logger logger = Logger.getLogger(getClass().getName());
     @Getter
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
