@@ -24,7 +24,7 @@ public class GUI {
     }
 
     public String askForUsername() {
-        System.out.println("Enter username: "); //TODO: input control + check if user already exists
+        System.out.println("Enter username: ");
         Scanner scanner = new Scanner(System.in);
         String username = scanner.nextLine();
         return username;
@@ -115,7 +115,7 @@ public class GUI {
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
-            } //TODO: add default error choice
+            }
             choice = null;
         }
     }

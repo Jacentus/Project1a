@@ -119,11 +119,10 @@ public class RequestHandler {
 
     public void processRequest(MessageRequest request) {
         MessageResponse messageResponse = new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, request.getUserName(), request.getChannelName(), request.getText());
-        logger.log(Level.INFO, "proceeding to save public msg to chat history......!");
-        clientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).save(request); // zmienna
-        logger.log(Level.INFO, "msg saved to history!");
+        logger.log(Level.INFO, "proceeding to save msg to chat history......!");
+        clientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).save(request);
         clientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).broadcast(clientHandler, messageResponse);
-        logger.log(Level.INFO, "Messages have been send");
+        logger.log(Level.INFO, "Message have been send");
     }
 
     public void processRequest(JoinPrivateChannelRequest request) {
@@ -155,6 +154,7 @@ public class RequestHandler {
         try {
             clientHandler.getObjectOutputStream().writeObject(response);
             clientHandler.getObjectOutputStream().flush();
+            clientHandler.getObjectOutputStream().reset();
             logger.log(Level.INFO, "Notice to requesting user has been send");
         } catch (IOException exception) {
             exception.printStackTrace();

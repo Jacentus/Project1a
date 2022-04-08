@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 public class ResponseHandler {
 
@@ -125,8 +126,9 @@ public class ResponseHandler {
 
     public void processResponse(GetChannelHistoryResponse response) {
         client.getLock().getServerResponseLock().lock();
+        List<MessageRequest> channelHistory = response.getChatHistory();
         try {
-            for (MessageRequest message : response.getChatHistory()) {
+            for (MessageRequest message : channelHistory) {
                 System.out.println(message);
             }
             client.getLock().getResponseHandled().signal();
@@ -136,7 +138,3 @@ public class ResponseHandler {
     }
 
 }
-
-
-
-

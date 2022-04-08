@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,28 +112,18 @@ public class Channel implements Serializable {
         logger = Logger.getLogger(getClass().getName());
     }
 
-    public void save(MessageRequest message) {
-        try {
-            lock.writeLock().lock();
-            this.getChannelHistory().add(message);
-            logger.log(Level.INFO, String.format("Message from %s saved to history of %s channel", message.getUserName(), this.getChannelName()));
-        } finally {
-            lock.writeLock().unlock();
-        }
+    public synchronized void save(MessageRequest message) {
+                channelHistory.add(message);
+                logger.log(Level.INFO, String.format("Message from %s saved to history of %s channel", message.getUserName(), this.getChannelName()));
     }
 
-    public List<MessageRequest> readHistory(String username) throws NoAccessToChatHistoryException, NoSuchChannelException {
-        lock.readLock().lock();
-        try {
+    public synchronized List<MessageRequest> readHistory(String username) throws NoAccessToChatHistoryException, NoSuchChannelException {
             if (isPermittedToGetHistory(username)) {
                 logger.log(Level.INFO, "reading chat history...");
-                return this.channelHistory; // this
+                return channelHistory;
             } else {
                 throw new NoAccessToChatHistoryException("You are not permitted to see this history");
             }
-        } finally {
-            lock.readLock().unlock();
-        }
     }
 
     public Boolean isPermittedToGetHistory(String userName) throws NoSuchChannelException {

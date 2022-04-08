@@ -20,11 +20,10 @@ public class ClientHandlersManager {
     private ChatHistoryReader fileHistoryReader;
     @Getter
     private static final File database = new File("chatHistory.txt");
-    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     public ClientHandlersManager() {
         this.fileHistoryReader = new FileHistoryReader();
-        this.mapOfAllChannels = new HashMap();
         readHistory();
     }
 

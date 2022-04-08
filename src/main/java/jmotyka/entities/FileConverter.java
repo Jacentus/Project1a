@@ -12,7 +12,6 @@ public class FileConverter {
 
     public byte[] transformIntoBytes(File file) {
         byte[] byteFile = new byte[0];
-        //logger.log(Level.INFO, "Preparing file to be send...");
         try {
             byteFile = Files.readAllBytes(file.toPath());
         } catch (IOException e) {

@@ -14,15 +14,11 @@
    nie zachowując jednocześnie "użytkowników" (obiektów klasy ClientHandler) obecnych na kanale na moment zamknięcia aplikacji. Nadpisując metodę ReadObject upewniam się, że lista aktywnych
    na kanale użytowników po ponownym uruchomieniu aplikacji nie będzie miała wartości null.
 
-4. nie użyłem ConcurrentHashMap ani SynchronizedHashMap, zamiast tego użyty został jawnie ReadWriteLock.
+4. użyłem Enum dla identyfikowania odpowiedzi i zapytań do serwera aby w łatwy sposób identyfikować, jakiego rodzaju Request/Response został otrzymany przez Serwer/Klienta.
 
-5. użyłem Enum dla identyfikowania odpowiedzi i zapytań do serwera aby w łatwy sposób identyfikować, jakiego rodzaju Request/Response został otrzymany przez Serwer/Klienta.
-
-6. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition w celu
+5. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition w celu
    zapewnienia poprawnego działania aplikacji i nie podejmowania nowego działania przez program, zanim poprzednie żądanie nie zostało przetworzone.
 
-7. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania bazy z cache do pliku.
+6. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania bazy z cache do pliku.
    Podobnie, przy uruchamianiu aplikacji jako jedna z pierwszych czynności wywoływana jest funkcja czytająca historię z pliku i zapisująca ją do kolekcji przechowywanej w pamięci podręcznej. Odczyt
    Klientów oraz zapisywanie nowych wiadomości następuje na mapach już w pamięci podręcznej.
-
-8.

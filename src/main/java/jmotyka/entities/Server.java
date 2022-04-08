@@ -20,7 +20,7 @@ public class Server {
     @Getter
     private final static String HOST = "localhost";
     @Getter
-    private final static int PORT = 10000; // TODO: do przemyślenia, czy nie wrzucić w config
+    private final static int PORT = 9999;
     private final ServerSocket serverSocket;
     private final Logger logger = Logger.getLogger(getClass().getName());
     private final ClientHandlersManager clientHandlersManager;

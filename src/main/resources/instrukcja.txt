@@ -1,0 +1,15 @@
+
+Nr portu oraz adres hosta są "zahardcode'owane" w klasie Serwer.
+
+Po uruchomieniu należy podać nazwę użytkownika, a aplikacja automatycznie uruchomi menu główne działające w pętli.
+
+Aby wykonywać operacje wystarczy wybrać z klawiatury odpowiednią liczbę odpowiadającą poleceniu z menu.
+
+Dodatkowo:
+- aby dokonać interakcji z kanałem (dołącz do kanału) należy znać jego nazwę;
+- wybór z menu "pokaż otwarte kanały" wylistuje wyłącznie kanały publiczne, do których każdy ma dostęp;
+- powyższe można zmienić jedną zmianą w kodzie w klasie RequestHandler - wywołanie opcji "pokaż wszystkie kanały" wylistuje wtedy również kanały prywatne,
+  nie zmieniając jednak w żaden sposób ograniczenia dostępu do nich;
+- lista kanałów na początku jest pusta;
+- przesyłanie pliku następuje z poziomu rozmowy. Wystarczy wpisać #FILE i postępować zgodnie z instrukcją;
+- chatbox (funkcję rozmowy) zamyka się wpisując w konsoli #EXIT tak samo, jakby wpisywało się wiadomość czy polecenie wysłania pliku;

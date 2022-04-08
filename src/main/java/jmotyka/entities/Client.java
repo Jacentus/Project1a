@@ -58,7 +58,8 @@ public class Client {
             while (socket.isConnected()) {
                 try {
                     //logger.log(Level.INFO, "Client is listening...");
-                    responseHandler.handleResponse((Response) inputStreamReader.readObject());
+                    responseHandler.handleResponse((Response)inputStreamReader.readUnshared());
+                    // responseHandler.handleResponse((Response) inputStreamReader.readObject());
                     //logger.log(Level.INFO, "Response has been handled by the Client");
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -85,8 +86,3 @@ public class Client {
     }
 
 }
-
-
-
-
-

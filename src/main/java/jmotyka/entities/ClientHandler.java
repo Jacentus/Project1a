@@ -26,7 +26,7 @@ public class ClientHandler implements Runnable {
     @Setter
     private String clientUsername;
     private RequestHandler requestHandler;
-    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     public ClientHandler(Socket socket, ClientHandlersManager clientHandlersManager) throws IOException {
         this.clientHandlersManager = clientHandlersManager;
@@ -81,6 +81,3 @@ public class ClientHandler implements Runnable {
     }
 
 }
-
-
-
