@@ -1,15 +1,13 @@
-package jmotyka;
+package jmotyka.entities;
 
 import jmotyka.requests.Request;
 import jmotyka.responses.Response;
-import jmotyka.serverResponseHandlers.ResponseHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Log
@@ -46,10 +44,10 @@ public class Client {
 
     public void sendRequest(Request request) {
         try {
-            logger.log(Level.INFO, "Sending request: " + request);
+            //logger.log(Level.INFO, "Sending request: " + request);
             outputStreamWriter.writeObject(request);
             outputStreamWriter.flush();
-            logger.log(Level.INFO, "request sent");
+            //logger.log(Level.INFO, "request sent");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,9 +57,9 @@ public class Client {
         new Thread(() -> {
             while (socket.isConnected()) {
                 try {
-                    logger.log(Level.INFO, "Client is listening...");
+                    //logger.log(Level.INFO, "Client is listening...");
                     responseHandler.handleResponse((Response) inputStreamReader.readObject());
-                    logger.log(Level.INFO, "Response has been handled by the Client");
+                    //logger.log(Level.INFO, "Response has been handled by the Client");
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                     close(socket, outputStreamWriter, inputStreamReader);

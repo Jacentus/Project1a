@@ -1,6 +1,7 @@
 package jmotyka.GUI;
 
-import jmotyka.Client;
+import jmotyka.entities.Client;
+import jmotyka.entities.FileConverter;
 import jmotyka.requests.*;
 import lombok.Getter;
 import lombok.Setter;

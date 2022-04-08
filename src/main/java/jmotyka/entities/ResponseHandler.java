@@ -1,6 +1,5 @@
-package jmotyka.serverResponseHandlers;
+package jmotyka.entities;
 
-import jmotyka.Client;
 import jmotyka.requests.*;
 import jmotyka.responses.*;
 

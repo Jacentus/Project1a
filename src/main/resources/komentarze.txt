@@ -1,24 +1,27 @@
 
-
 1. zdecydowałem się na hashMapę do przetrzymywania obiektów klasy ClientHandler w hashMapie ze względu na możliwość prostej identyfikacji
-   i dostania się do konkretnego kanału(pokoju) w czasie O(1). Klasa Channel przetrzymuje historię danego kanału, użytkowników uprawnionych do interakcji z kanałem.
+   i dostania się do konkretnego kanału(pokoju) w czasie O(1). Klasa Channel przetrzymuje historię danego kanału, użytkowników uprawnionych do interakcji z kanałem
+   oraz zarządza metodami dostępu do danego kanału, zapisu wiadomości w historii, weryfikacji dostępu do danego kanału.
 
 2. zdecydowałem się na użycie Executor'a newCachedThreadPool() ze względu na fakt, że moja aplikacja najpewniej nie zostanie użyta w sposób
    wymagający uruchomienia większej ilości wątków do obsługi Klientów. Wydaje mi się, że wątek do obsługi Klienta, po jego rozłączeniu się od
-   Socket'u, i usunięciu z listy adresatów w pokojach pozostanie nieaktywny, ale niekoniecznie zostanie usunięty z pamięci. Ten rodzaj egzekutowa powinien zapenić, że nieużywany wątek zostanie użyty ponownie
+   Socket'u, i usunięciu z listy adresatów w pokojach pozostanie nieaktywny, ale niekoniecznie zostanie usunięty z pamięci. Ten rodzaj egzekutowa powinien zapewnić, że nieużywany wątek zostanie użyty ponownie
    w celu oszczędzenia pamięci.
 
 3. zdecydowałem się na przesyłanie serializowanych obiektów ze względu na łatwość operowania na nich (w tym zapisu i odczytu z pliku) oraz próbę napisania aplikacji w sposób
-   jak nabardziej obiektowy. Dzięki temu w łatwy sposób zapisuję do/odczytuję z pliku (bazy) gotowe obiekty zawierające min. listy uprawnionych do czytania historii/dołączenia użytkowników,
-   czy wiadomości. Ponadto po "wstaniu" aplikacja zapamiętuje kanały, jakie istniały przy jej zamknieciu i pozwala na ponowne dołączenie do niej uprawnionych użytkowników.
+   jak nabardziej obiektowy. Dzięki temu w łatwy sposób zapisuję do/odczytuję z bazy (pliku) gotowe obiekty zawierające min. listy uprawnionych do czytania historii/dołączenia użytkowników,
+   czy wiadomości. Ponadto po "wstaniu" aplikacja zapamiętuje kanały, jakie istniały przy jej zamknieciu i pozwala na ponowne dołączenie do niej uprawnionych użytkowników,
+   nie zachowując jednocześnie "użytkowników" (obiektów klasy ClientHandler) obecnych na kanale na moment zamknięcia aplikacji. Nadpisując metodę ReadObject upewniam się, że lista aktywnych
+   na kanale użytowników po ponownym uruchomieniu aplikacji nie będzie miała wartości null.
 
-4. nie użyłem ConcurrentHashMap ani SynchronizedHashMap w celach edukacyjnych, zamiast tego użyty został ReadWriteLock.
+4. nie użyłem ConcurrentHashMap ani SynchronizedHashMap, zamiast tego użyty został jawnie ReadWriteLock.
 
-5. użyłem Enum dla identyfikowania odpowiedzi i zapytań do serwera.
+5. użyłem Enum dla identyfikowania odpowiedzi i zapytań do serwera aby w łatwy sposób identyfikować, jakiego rodzaju Request/Response został otrzymany przez Serwer/Klienta.
 
-6. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition.
+6. Klient oczekuje na odpowiedź z serwera (wtedy, gdy jest to wymagane dla poprawnego działania aplikacji lub uzyskania pożądanego rezultatu) poprzez współdzielony pomiędzy klasami Lock z Condition w celu
+   zapewnienia poprawnego działania aplikacji i nie podejmowania nowego działania przez program, zanim poprzednie żądanie nie zostało przetworzone.
 
-7. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania bazy w cache do pliku.
+7. aby zagwarantować zapisanie historii rozmów do bazy użyłem ShutDownHook uruchamiany w momencie zamknięcia serwera, wywołujący funkcję zapisania bazy z cache do pliku.
    Podobnie, przy uruchamianiu aplikacji jako jedna z pierwszych czynności wywoływana jest funkcja czytająca historię z pliku i zapisująca ją do kolekcji przechowywanej w pamięci podręcznej. Odczyt
    Klientów oraz zapisywanie nowych wiadomości następuje na mapach już w pamięci podręcznej.
 

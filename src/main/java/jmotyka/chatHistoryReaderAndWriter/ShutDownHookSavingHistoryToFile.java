@@ -1,7 +1,6 @@
 package jmotyka.chatHistoryReaderAndWriter;
 
-import jmotyka.ClientHandlersManager;
-
+import jmotyka.entities.ClientHandlersManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

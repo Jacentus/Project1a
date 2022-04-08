@@ -1,6 +1,8 @@
 package jmotyka;
 
 import jmotyka.GUI.GUI;
+import jmotyka.entities.Client;
+import jmotyka.entities.Server;
 import jmotyka.requests.IntroductionRequest;
 import jmotyka.requests.Request;
 

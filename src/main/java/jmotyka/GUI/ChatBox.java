@@ -1,6 +1,7 @@
 package jmotyka.GUI;
 
-import jmotyka.Client;
+import jmotyka.entities.Client;
+import jmotyka.entities.FileConverter;
 import jmotyka.requests.MessageRequest;
 import jmotyka.requests.Request;
 import jmotyka.requests.SendFileRequest;
@@ -16,7 +17,7 @@ public class ChatBox {
     protected Scanner scanner;
     protected FileConverter fileConverter;
     protected Client client;
-    private String channelName;
+    private final String channelName;
 
     public ChatBox(Scanner scanner, FileConverter fileConverter, Client client, String channelName) {
         this.scanner = scanner;
@@ -28,7 +29,7 @@ public class ChatBox {
     public void launchChatBox() {
         System.out.println("** START CHATTING **");
         System.out.println("** TYPE #EXIT TO QUIT, TYPE #FILE TO SEND A FILE **");
-        String text = null;
+        String text;
         while (true) {
             text = scanner.nextLine();
             if (text.equalsIgnoreCase("#EXIT")) {
@@ -50,7 +51,7 @@ public class ChatBox {
     private void sendMessage(String text) {
         MessageRequest message = new MessageRequest(client.getUsername(), channelName, Request.RequestType.MESSAGE, text);
         client.sendRequest(message);
-        logger.log(Level.INFO, "Message send");
+        //logger.log(Level.INFO, "Message send");
     }
 
     private void sendFile(File file) {

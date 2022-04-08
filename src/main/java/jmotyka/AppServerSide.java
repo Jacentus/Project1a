@@ -1,5 +1,7 @@
 package jmotyka;
 
+import jmotyka.entities.Server;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 

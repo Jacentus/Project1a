@@ -1,7 +1,9 @@
-package jmotyka;
+package jmotyka.entities;
 
 import jmotyka.chatHistoryReaderAndWriter.ShutDownHookSavingHistoryToFile;
 import jmotyka.entities.ChatHistory;
+import jmotyka.entities.ClientHandler;
+import jmotyka.entities.ClientHandlersManager;
 import lombok.Getter;
 import lombok.extern.java.Log;
 

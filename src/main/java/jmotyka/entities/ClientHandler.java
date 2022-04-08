@@ -1,7 +1,5 @@
-package jmotyka;
+package jmotyka.entities;
 
-import jmotyka.clientRequestHandlers.RequestHandler;
-import jmotyka.entities.Channel;
 import jmotyka.requests.HandleableRequest;
 import lombok.Getter;
 import lombok.Setter;

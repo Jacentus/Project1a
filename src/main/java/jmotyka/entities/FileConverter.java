@@ -1,4 +1,4 @@
-package jmotyka.GUI;
+package jmotyka.entities;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package jmotyka;
+package jmotyka.entities;
 
 import jmotyka.entities.Channel;
 import jmotyka.entities.ChatHistory;
@@ -14,7 +14,7 @@ public class ClientHandlersManager {
 
     @Getter
     @Setter
-    private static Map<String, Channel> mapOfAllChannels = new HashMap<>();
+    private volatile static Map<String, Channel> mapOfAllChannels = new HashMap<>();
     @Getter
     private static ChatHistory history;
 
@@ -23,9 +23,7 @@ public class ClientHandlersManager {
     }
 
     public Boolean checkIfChannelAlreadyExists(String channelName) {
-        if (mapOfAllChannels.containsKey(channelName)) {
-            return true;
-        } else return false;
+        return mapOfAllChannels.containsKey(channelName);
     }
 
 }

@@ -1,13 +1,6 @@
-package jmotyka.clientRequestHandlers;
+package jmotyka.entities;
 
-import jmotyka.ClientHandler;
-import jmotyka.ClientHandlersManager;
-import jmotyka.chatHistoryReaderAndWriter.CacheHistorySaver;
-import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
-import jmotyka.chatHistoryReaderAndWriter.ChatHistorySaver;
-import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
-import jmotyka.entities.Channel;
-import jmotyka.exceptions.NoAccesToChannelException;
+import jmotyka.exceptions.NoAccessToChannelException;
 import jmotyka.exceptions.NoAccessToChatHistoryException;
 import jmotyka.exceptions.NoSuchChannelException;
 import jmotyka.requests.*;
@@ -24,10 +17,8 @@ public class RequestHandler {
 
     private final ClientHandlersManager clientHandlersManager;
     private final ClientHandler clientHandler;
-    private ReadWriteLock lock = new ReentrantReadWriteLock();
-    private ChatHistorySaver historySaver = new CacheHistorySaver();
-    private ChatHistoryReader historyReader = new FileHistoryReader();
-    protected static final Logger logger = Logger.getLogger(RequestHandler.class.getName());
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final Logger logger = Logger.getLogger(RequestHandler.class.getName());
 
     public RequestHandler(ClientHandlersManager clientHandlersManager, ClientHandler clientHandler) {
         this.clientHandlersManager = clientHandlersManager;
@@ -83,7 +74,7 @@ public class RequestHandler {
         if (getAllChannelsResponse.getAllChannelsNames() != null) {
             broadcastToSender(clientHandler, getAllChannelsResponse);
         } else {
-            String error = "No channels avaialble. Create a new one!";
+            String error = "No channels available. Create a new one!";
             broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, error));
         }
     }
@@ -109,11 +100,11 @@ public class RequestHandler {
                 broadcastToSender(clientHandler, joinPublicChannelResponse);
                 ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).broadcast(clientHandler, new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, "SERVER", request.getUserName(), "HAS JOINED THE CHANNEL"));
                 logger.log(Level.INFO, "Notifications has been send");
-            } catch (NoAccesToChannelException exception) {
+            } catch (NoAccessToChannelException exception) {
                 broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, exception.getMessage()));
             }
         } else {
-            lock.writeLock().lock(); //todo: upewnij się że to nie blokuje wątku
+            lock.writeLock().lock();
             try {
                 Channel newChannel = new Channel(request.getChannelName());
                 newChannel.getPermittedUsers().add(request.getUserName());
@@ -129,7 +120,7 @@ public class RequestHandler {
     public void processRequest(MessageRequest request) {
         MessageResponse messageResponse = new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, request.getUserName(), request.getChannelName(), request.getText());
         logger.log(Level.INFO, "proceeding to save public msg to chat history......!");
-        historySaver.save(request, request.getChannelName());
+        ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).save(request);
         logger.log(Level.INFO, "msg saved to history!");
         ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).broadcast(clientHandler, messageResponse);
         logger.log(Level.INFO, "Messages have been send");
@@ -144,7 +135,7 @@ public class RequestHandler {
                 ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName())
                         .broadcast(clientHandler, new MessageResponse(Response.ResponseType.MESSAGE_RESPONSE, "SERVER", request.getUserName(), "HAS JOINED THE CHANNEL"));
                 logger.log(Level.INFO, "Success");
-            } catch (NoAccesToChannelException exception) {
+            } catch (NoAccessToChannelException exception) {
                 broadcastToSender(clientHandler, new JoinPrivateChannelResponse(Response.ResponseType.JOIN_PRIVATE_CHANNEL_RESPONSE, false, request.getChannelName()));
             }
         } else {
@@ -180,13 +171,15 @@ public class RequestHandler {
         logger.log(Level.INFO, "Trying to get channel history...");
         List<MessageRequest> channelHistory;
         try {
-            channelHistory = historyReader.read(request.getUserName(), request.getChannelName());
+            channelHistory = ClientHandlersManager.getMapOfAllChannels().get(request.getChannelName()).readHistory(request.getUserName());
             GetChannelHistoryResponse response = new GetChannelHistoryResponse(Response.ResponseType.GET_CHANNEL_HISTORY_RESPONSE, channelHistory);
             broadcastToSender(clientHandler, response);
         } catch (NoAccessToChatHistoryException | NoSuchChannelException e) {
             e.printStackTrace();
             String error = e.getMessage();
             broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, error));
+        } catch (NullPointerException e){
+            broadcastToSender(clientHandler, new ErrorResponse(Response.ResponseType.ERROR, "NO SUCH CHANNEL"));
         }
     }
 

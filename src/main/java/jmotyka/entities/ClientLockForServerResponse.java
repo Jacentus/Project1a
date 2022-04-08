@@ -1,4 +1,4 @@
-package jmotyka;
+package jmotyka.entities;
 
 import lombok.Getter;
 

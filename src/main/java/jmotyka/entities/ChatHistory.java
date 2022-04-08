@@ -1,6 +1,5 @@
 package jmotyka.entities;
 
-import jmotyka.ClientHandlersManager;
 import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
 import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
 
@@ -12,7 +11,7 @@ import java.util.HashMap;
 public class ChatHistory {
 
     @Getter
-    private final File database = new File("chatHistory.txt");
+    private static final File database = new File("chatHistory.txt");
     @Getter
     private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
 
@@ -21,7 +20,7 @@ public class ChatHistory {
             if (database.length() <= 0) {
                 ClientHandlersManager.setMapOfAllChannels(new HashMap<>());
             } else {
-                ClientHandlersManager.setMapOfAllChannels(fileHistoryReader.readFromFile(database));
+                ClientHandlersManager.setMapOfAllChannels(fileHistoryReader.read(database));
             }
         } catch (Exception e) {
             e.printStackTrace();

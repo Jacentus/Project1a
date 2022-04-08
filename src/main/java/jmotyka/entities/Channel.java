@@ -1,11 +1,11 @@
 package jmotyka.entities;
 
-import jmotyka.ClientHandler;
-import jmotyka.exceptions.NoAccesToChannelException;
+import jmotyka.exceptions.NoAccessToChannelException;
+import jmotyka.exceptions.NoAccessToChatHistoryException;
+import jmotyka.exceptions.NoSuchChannelException;
 import jmotyka.requests.MessageRequest;
 import jmotyka.responses.Response;
 import lombok.Getter;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -18,17 +18,17 @@ import java.util.logging.Logger;
 public class Channel implements Serializable {
 
     @Getter
-    private String channelName;
+    private final String channelName;
     @Getter
-    private boolean isPrivate;
+    private final boolean isPrivate;
     @Getter
-    private List<String> permittedUsers;
+    private final List<String> permittedUsers;
     @Getter
     private transient List<ClientHandler> usersInChannel;
     @Getter
-    private List<MessageRequest> channelHistory;
+    private volatile List<MessageRequest> channelHistory;
     @Getter
-    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private transient Logger logger = Logger.getLogger(getClass().getName());
 
     public Channel(String channelName) {
@@ -47,7 +47,7 @@ public class Channel implements Serializable {
         this.channelHistory = new ArrayList<>();
     }
 
-    public void addClientToChannel(ClientHandler clientHandler) throws NoAccesToChannelException {
+    public void addClientToChannel(ClientHandler clientHandler) throws NoAccessToChannelException {
         lock.writeLock().lock();
         try {
             if (isPermittedToJoin(clientHandler.getClientUsername())) {
@@ -57,18 +57,20 @@ public class Channel implements Serializable {
                 }
                 logger.log(Level.INFO, String.format("New user %s entered %s channel", clientHandler.getClientUsername(), channelName));
                 logger.log(Level.INFO, String.format("%s active users in %s channel", usersInChannel.size(), channelName));
-            } else throw new NoAccesToChannelException("You are not allowed to join this channel!");
+            } else throw new NoAccessToChannelException("You are not allowed to join this channel!");
         } finally {
             lock.writeLock().unlock();
         }
     }
 
     public Boolean isPermittedToJoin(String userName) {
-        if (this.isPrivate) {
+        if (!this.isPrivate) {
+            return true;
+        } else {
             for (String user : this.getPermittedUsers()) {
                 if (user.equals(userName)) return true;
             }
-        } else if (!this.isPrivate) return true;
+        }
         return false;
     }
 
@@ -91,7 +93,7 @@ public class Channel implements Serializable {
                     try {
                         client.getObjectOutputStream().writeObject(response);
                         client.getObjectOutputStream().flush();
-                        logger.log(Level.INFO, "MESSAGE HAS BEEN BROADCASTED TO " + client.getClientUsername());
+                        logger.log(Level.INFO, "MESSAGE HAS BEEN SEND TO " + client.getClientUsername());
                     } catch (IOException exception) {
                         exception.printStackTrace();
                     }
@@ -106,6 +108,42 @@ public class Channel implements Serializable {
         in.defaultReadObject();
         usersInChannel = new ArrayList<>();
         logger = Logger.getLogger(getClass().getName());
+    }
+
+    public void save(MessageRequest message) {
+        try {
+            lock.writeLock().lock();
+            this.getChannelHistory().add(message);
+            logger.log(Level.INFO, String.format("Message from %s saved to history of %s channel", message.getUserName(), this.getChannelName()));
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    public List<MessageRequest> readHistory(String username) throws NoAccessToChatHistoryException, NoSuchChannelException {
+        lock.readLock().lock();
+        try {
+            if (isPermittedToGetHistory(username)) {
+                logger.log(Level.INFO, "reading chat history...");
+                return this.channelHistory;
+            } else {
+                throw new NoAccessToChatHistoryException("You are not permitted to see this history");
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    public Boolean isPermittedToGetHistory(String userName) throws NoSuchChannelException {
+        Boolean permittedToSeeHistory = false;
+        if (this == null) {
+            throw new NoSuchChannelException("SUCH CHANNEL DOES NOT EXIST");
+        }
+        if (this.getPermittedUsers().contains(userName)) {
+            logger.log(Level.INFO, "USER PERMITTED TO GET HISTORY");
+            permittedToSeeHistory = true;
+        }
+        return permittedToSeeHistory;
     }
 
     @Override
