@@ -125,7 +125,7 @@ public class Channel implements Serializable {
         try {
             if (isPermittedToGetHistory(username)) {
                 logger.log(Level.INFO, "reading chat history...");
-                return this.channelHistory;
+                return this.channelHistory; // this
             } else {
                 throw new NoAccessToChatHistoryException("You are not permitted to see this history");
             }

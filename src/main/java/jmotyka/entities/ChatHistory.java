@@ -1,3 +1,4 @@
+/*
 package jmotyka.entities;
 
 import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
@@ -10,12 +11,15 @@ import java.util.HashMap;
 
 public class ChatHistory {
 
-    @Getter
+*/
+/*    @Getter
     private static final File database = new File("chatHistory.txt");
     @Getter
-    private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
+    private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();*//*
 
-    public ChatHistory() {
+
+*/
+/*    public ChatHistory() {
         try {
             if (database.length() <= 0) {
                 ClientHandlersManager.setMapOfAllChannels(new HashMap<>());
@@ -26,6 +30,7 @@ public class ChatHistory {
             e.printStackTrace();
             System.out.println("EXCEPTION - EMPTY FILE WAS READ");
         }
-    }
+    }*//*
 
-}
+
+}*/

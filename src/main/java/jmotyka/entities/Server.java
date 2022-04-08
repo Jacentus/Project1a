@@ -1,13 +1,11 @@
 package jmotyka.entities;
 
 import jmotyka.chatHistoryReaderAndWriter.ShutDownHookSavingHistoryToFile;
-import jmotyka.entities.ChatHistory;
-import jmotyka.entities.ClientHandler;
-import jmotyka.entities.ClientHandlersManager;
 import lombok.Getter;
 import lombok.extern.java.Log;
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -30,12 +28,12 @@ public class Server {
 
     public Server(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
-        this.clientHandlersManager = new ClientHandlersManager(new ChatHistory());
+        this.clientHandlersManager = new ClientHandlersManager();
     }
 
     public void startServer() {
         logger.log(Level.INFO, "Server is listening on port: " + getPORT());
-        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownHookSavingHistoryToFile()));
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownHookSavingHistoryToFile(clientHandlersManager)));
         try {
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();

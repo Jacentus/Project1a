@@ -52,7 +52,7 @@ public class ClientHandler implements Runnable {
                 //logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
                 logger.log(Level.INFO, "Error when handling Client's requests. Closing...");
-                killConnectionWithClient(ClientHandlersManager.getMapOfAllChannels(), this);
+                killConnectionWithClient(clientHandlersManager.getMapOfAllChannels(), this);
                 e.printStackTrace();
                 closeStreams(objectInputStream, objectOutputStream);
                 Server.closeSocket(socket);

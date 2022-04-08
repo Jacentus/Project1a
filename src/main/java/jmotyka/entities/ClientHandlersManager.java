@@ -1,29 +1,47 @@
 package jmotyka.entities;
 
-import jmotyka.entities.Channel;
-import jmotyka.entities.ChatHistory;
+import jmotyka.chatHistoryReaderAndWriter.ChatHistoryReader;
+import jmotyka.chatHistoryReaderAndWriter.FileHistoryReader;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
-
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Log
 public class ClientHandlersManager {
 
     @Getter
     @Setter
-    private volatile static Map<String, Channel> mapOfAllChannels = new HashMap<>();
+    private Map<String, Channel> mapOfAllChannels = new HashMap();
+    private final ChatHistoryReader fileHistoryReader = new FileHistoryReader();
     @Getter
-    private static ChatHistory history;
+    private static final File database = new File("chatHistory.txt");
+    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
-    public ClientHandlersManager(ChatHistory history) {
-        this.history = history;
+    public ClientHandlersManager() {
+        readHistory();
     }
 
     public Boolean checkIfChannelAlreadyExists(String channelName) {
         return mapOfAllChannels.containsKey(channelName);
+    }
+
+    public void readHistory() {
+        logger.log(Level.INFO, "Reading database...");
+        try {
+            if (database.length() <= 0) {
+                this.setMapOfAllChannels(new HashMap<>());
+            } else {
+                this.setMapOfAllChannels(fileHistoryReader.read(database));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("EXCEPTION - EMPTY FILE WAS READ");
+        }
     }
 
 }

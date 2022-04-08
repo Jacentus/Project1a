@@ -11,11 +11,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class ShutDownHookSavingHistoryToFile implements Runnable {
 
-    ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private ClientHandlersManager manager;
+    public ShutDownHookSavingHistoryToFile(ClientHandlersManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public void run() {
-        saveToFile(ClientHandlersManager.getHistory().getDatabase(), ClientHandlersManager.getMapOfAllChannels());
+        saveToFile(ClientHandlersManager.getDatabase(), manager.getMapOfAllChannels());
     }
 
     public <T extends Map> void saveToFile(File file, T map) {
