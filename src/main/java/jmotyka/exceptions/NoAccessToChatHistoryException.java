@@ -10,4 +10,5 @@ public class NoAccessToChatHistoryException extends Exception {
     public NoAccessToChatHistoryException(String message) {
         this.message = message;
     }
+
 }

@@ -21,4 +21,5 @@ public class CreatePrivateChannelResponse extends Response {
         super(responseType);
         this.isPermitted = isPermitted;
     }
+
 }

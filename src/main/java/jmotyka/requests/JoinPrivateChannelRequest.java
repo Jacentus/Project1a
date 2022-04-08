@@ -2,7 +2,7 @@ package jmotyka.requests;
 
 import lombok.Getter;
 
-public class JoinPrivateChannelRequest extends Request{
+public class JoinPrivateChannelRequest extends Request {
 
     @Getter
     private String channelName;

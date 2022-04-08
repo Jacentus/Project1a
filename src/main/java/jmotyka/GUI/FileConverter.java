@@ -8,11 +8,11 @@ import java.util.logging.Logger;
 
 public class FileConverter {
 
-    private final Logger logger = Logger.getLogger(getClass().getName()); //TODO: transfer to interface
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     public byte[] transformIntoBytes(File file) {
         byte[] byteFile = new byte[0];
-        logger.log(Level.INFO, "Preparing file to be send...");
+        //logger.log(Level.INFO, "Preparing file to be send...");
         try {
             byteFile = Files.readAllBytes(file.toPath());
         } catch (IOException e) {

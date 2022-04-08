@@ -2,8 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-
-public class SendFileResponse extends Response{
+public class SendFileResponse extends Response {
 
     @Getter
     private String userName;
@@ -20,4 +19,3 @@ public class SendFileResponse extends Response{
     }
 
 }
-

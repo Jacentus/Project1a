@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class FileHistoryReader implements ChatHistoryReader {
 
     private ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
     public List<MessageRequest> read(String username, String channelName) throws NoAccessToChatHistoryException, NoSuchChannelException {
@@ -27,13 +27,13 @@ public class FileHistoryReader implements ChatHistoryReader {
             } else {
                 throw new NoAccessToChatHistoryException("You are not permitted to see this history");
             }
-        } finally{
-                lock.readLock().unlock();
-            }
+        } finally {
+            lock.readLock().unlock();
         }
+    }
 
     @Override
-    public <K, V> Map<K, V> readFromFile(File file) {
+    public <K, V> Map<K, V> readFromFile(File file) { //TODO: do przeniesienia do osobnej klasy
         Map<K, V> history = null;
         lock.readLock().lock();
         try {
@@ -58,8 +58,8 @@ public class FileHistoryReader implements ChatHistoryReader {
 
     public Boolean isPermittedToGetHistory(String channelName, String userName) throws NoSuchChannelException {
         Boolean permittedToSeeHistory = false;
-        if (ClientHandlersManager.getMapOfAllChannels().get(channelName) == null){
-        throw new NoSuchChannelException("SUCH CHANNEL DOES NOT EXIST");
+        if (ClientHandlersManager.getMapOfAllChannels().get(channelName) == null) {
+            throw new NoSuchChannelException("SUCH CHANNEL DOES NOT EXIST");
         }
         if (ClientHandlersManager.getMapOfAllChannels().get(channelName).getPermittedUsers().contains(userName)) {
             logger.log(Level.INFO, String.format("USER PERMITTED TO GET HISTORY"));

@@ -59,7 +59,6 @@ public class GUI {
                     ChatBox publicChatBox = new ChatBox(scanner, fileConverter, client, channelName);
                     publicChatBox.launchChatBox();
                     client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, channelName));
-                    //client.setChannelName(null);
                     break;
                 case "3":
                     System.out.println("Type channel name: ");
@@ -84,8 +83,8 @@ public class GUI {
                         client.getLock().getServerResponseLock().unlock();
                     }
                     if (client.getIsPermittedToChat()) {
-                        ChatBox privateChatBox1 = new ChatBox(scanner, fileConverter, client, newPrivateChannelName);
-                        privateChatBox1.launchChatBox();
+                        ChatBox creatorChatBox = new ChatBox(scanner, fileConverter, client, newPrivateChannelName);
+                        creatorChatBox.launchChatBox();
                         client.sendRequest(new RemoveFromChannelRequest(client.getUsername(), Request.RequestType.REMOVE_FROM_CHANNEL, newPrivateChannelName));
                     }
                     break;
@@ -115,9 +114,7 @@ public class GUI {
                     } finally {
                         client.getLock().getServerResponseLock().unlock();
                     }
-                //default:
-                    //System.out.println("No such command! Try again");
-            }
+            } //TODO: add default error choice
             choice = null;
         }
     }

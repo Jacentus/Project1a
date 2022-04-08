@@ -1,7 +1,6 @@
 package jmotyka.entities;
 
 import jmotyka.ClientHandler;
-import jmotyka.ClientHandlersManager;
 import jmotyka.exceptions.NoAccesToChannelException;
 import jmotyka.requests.MessageRequest;
 import jmotyka.responses.Response;
@@ -12,8 +11,6 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,14 +22,13 @@ public class Channel implements Serializable {
     @Getter
     private boolean isPrivate;
     @Getter
-    private List<String> permittedUsers; // TODO: jeżeli czat jest prywatny, to dostęp do historii będą mieli tylko ci userzy. jeśli jest publiczny, to każdy user który dołączy będzie tu dodawany.
+    private List<String> permittedUsers;
     @Getter
     private transient List<ClientHandler> usersInChannel;
     @Getter
-    private List<MessageRequest> channelHistory;   // TODO : czy na pewno?
+    private List<MessageRequest> channelHistory;
     @Getter
     private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
     private transient Logger logger = Logger.getLogger(getClass().getName());
 
     public Channel(String channelName) {
@@ -87,7 +83,7 @@ public class Channel implements Serializable {
         }
     }
 
-    public void broadcast(ClientHandler clientHandler, Response response) { // TODO: nie jestem pewien czy nadaję do dobrych socketów
+    public void broadcast(ClientHandler clientHandler, Response response) {
         lock.readLock().lock();
         try {
             for (ClientHandler client : usersInChannel) {
@@ -106,7 +102,7 @@ public class Channel implements Serializable {
         }
     }
 
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         usersInChannel = new ArrayList<>();
         logger = Logger.getLogger(getClass().getName());

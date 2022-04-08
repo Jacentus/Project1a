@@ -10,11 +10,9 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ShutDownHookSavingHistoryToFile implements Runnable{
+public class ShutDownHookSavingHistoryToFile implements Runnable {
 
     ReadWriteLock lock = new ReentrantReadWriteLock();
-
-    public ShutDownHookSavingHistoryToFile() {} // usunąłem instacje ClientHandlersManagera z konstruktora, wydawał się niepotrzbny bo odwołuję się do statycznego obiektu
 
     @Override
     public void run() {

@@ -2,7 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-public class ErrorResponse extends Response{
+public class ErrorResponse extends Response {
 
     @Getter
     private String message;
@@ -11,4 +11,5 @@ public class ErrorResponse extends Response{
         super(responseType);
         this.message = message;
     }
+
 }

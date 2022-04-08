@@ -18,19 +18,15 @@ public class ChatHistory {
 
     public ChatHistory() {
         try {
-            if(database.length() <= 0){
+            if (database.length() <= 0) {
                 ClientHandlersManager.setMapOfAllChannels(new HashMap<>());
             } else {
                 ClientHandlersManager.setMapOfAllChannels(fileHistoryReader.readFromFile(database));
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             System.out.println("EXCEPTION - EMPTY FILE WAS READ");
         }
     }
-
-
-
-
 
 }

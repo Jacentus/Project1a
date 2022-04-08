@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class CacheHistorySaver implements ChatHistorySaver {
 
     private static ReadWriteLock lock = new ReentrantReadWriteLock();
-    private static final Logger logger = Logger.getLogger(CacheHistorySaver.class.getName()); // TODO: ukryć pod interfejsem
+    private static final Logger logger = Logger.getLogger(CacheHistorySaver.class.getName());
 
     public void save(MessageRequest message, String channelName) {
         try {

@@ -2,7 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-public class JoinPrivateChannelResponse extends Response{
+public class JoinPrivateChannelResponse extends Response {
 
     @Getter
     private Boolean isPermitted;

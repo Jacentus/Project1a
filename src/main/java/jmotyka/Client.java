@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 @Log
 public class Client {
 
-    private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
+    private final Logger logger = Logger.getLogger(getClass().getName());
     @Getter
     private final ResponseHandler responseHandler = new ResponseHandler(this);
     @Getter
@@ -27,13 +27,12 @@ public class Client {
     private String username;
     @Getter
     @Setter
-    private String channelName; //TODO: przemyśl lepszy i łatwiejszy sposób na identyfikowanie kanałów
-
+    private String channelName;
     @Getter
     @Setter
     private Boolean isPermittedToChat;
 
-    public Client(Socket socket, String username) throws IOException {
+    public Client(Socket socket, String username) {
         try {
             this.socket = socket;
             this.username = username;

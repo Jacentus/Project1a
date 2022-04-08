@@ -7,7 +7,8 @@ import java.util.List;
 
 public class GetAllChannelsResponse extends Response {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     List<String> allChannelsNames;
 
     public GetAllChannelsResponse(ResponseType responseType, List<String> allChannelsNames) {

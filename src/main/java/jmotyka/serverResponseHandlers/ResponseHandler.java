@@ -9,7 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego na osobne klasy lub nie powielić schematy z requestów
+public class ResponseHandler {
 
     private Client client;
 
@@ -62,9 +62,9 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
         try {
             client.setIsPermittedToChat(response.getIsPermitted());
             if (client.getIsPermittedToChat()) {
-                System.out.println("Private channel created! Waiting for " + (response.getPermittedUsers()) + " to join...");
+                System.out.println("Private channel has been created! Waiting for " + (response.getPermittedUsers()) + " to join...");
             } else {
-                System.out.println("Such channel already exists and you are not permitted to join it!");
+                System.out.println("Such channel already exists! Use join private channel option");
             }
             client.getLock().getResponseHandled().signal();
         } finally {
@@ -89,10 +89,10 @@ public class ResponseHandler { //TODO: zastanów się, czy nie podzielić tego n
     public void processResponse(JoinPrivateChannelResponse response) {
         client.getLock().getServerResponseLock().lock();
         try {
-            System.out.println(String.format("\nYou tried to join %s channel!", response.getChannelName()));
+            System.out.println(String.format("You tried to join %s channel!", response.getChannelName()));
             client.setIsPermittedToChat(response.getIsPermitted());
             if (!client.getIsPermittedToChat()) {
-                System.out.println("You are not allowed to join that channel");
+                System.out.println("You are not allowed to join that channel.");
             }
             client.getLock().getResponseHandled().signal();
         } finally {

@@ -17,7 +17,7 @@ public class MessageRequest extends Request {
 
     @Override
     public String toString() {
-        return "[" + super.getUserName() + " | " + channelName + "] " + text + '\'';
+        return "[" + super.getUserName() + " | " + channelName + "] " + text;
     }
 
 }

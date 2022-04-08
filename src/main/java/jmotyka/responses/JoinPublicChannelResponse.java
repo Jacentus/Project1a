@@ -2,7 +2,7 @@ package jmotyka.responses;
 
 import lombok.Getter;
 
-public class JoinPublicChannelResponse extends Response{
+public class JoinPublicChannelResponse extends Response {
 
     @Getter
     private String channelName;

@@ -3,8 +3,6 @@ package jmotyka;
 import jmotyka.clientRequestHandlers.RequestHandler;
 import jmotyka.entities.Channel;
 import jmotyka.requests.HandleableRequest;
-import jmotyka.requests.RemoveFromChannelRequest;
-import jmotyka.requests.Request;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
@@ -28,12 +26,11 @@ public class ClientHandler implements Runnable {
     private ObjectOutputStream objectOutputStream;
     @Getter
     @Setter
-    private String clientUsername; //TODO: zastanowić sie, czy tego nie ugenerycznić w jakiś sposób
+    private String clientUsername;
     private RequestHandler requestHandler;
     private final Logger logger = Logger.getLogger(getClass().getName()); // TODO: ukryć pod interfejsem
 
     public ClientHandler(Socket socket, ClientHandlersManager clientHandlersManager) throws IOException {
-        // todo: atomic integer id dla usera?
         this.clientHandlersManager = clientHandlersManager;
         try {
             this.socket = socket;
@@ -43,7 +40,7 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             logger.log(Level.INFO, "ClientHandler failed to start...");
             Server.closeSocket(socket);
-            closeStreams(objectInputStream, objectOutputStream); // TODO: zastanowic się, czy nie dac tego na np. shutdownhook
+            closeStreams(objectInputStream, objectOutputStream);
         }
     }
 
@@ -51,10 +48,10 @@ public class ClientHandler implements Runnable {
     public void run() {
         while (socket.isConnected()) {
             try {
-                logger.log(Level.INFO, "client handler waiting for requests...");
+                //logger.log(Level.INFO, "client handler waiting for requests...");
                 HandleableRequest request = ((HandleableRequest) objectInputStream.readObject());
                 requestHandler.handleRequest(request);
-                logger.log(Level.INFO, "client handler processed request.");
+                //logger.log(Level.INFO, "client handler processed request.");
             } catch (IOException | ClassNotFoundException e) {
                 logger.log(Level.INFO, "Error when handling Client's requests. Closing...");
                 killConnectionWithClient(ClientHandlersManager.getMapOfAllChannels(), this);
@@ -79,9 +76,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public void killConnectionWithClient(Map<String, Channel> allChannels, ClientHandler clientHandler){
-        for (Channel channel: allChannels.values()) {
-                channel.getUsersInChannel().remove(clientHandler);
+    public void killConnectionWithClient(Map<String, Channel> allChannels, ClientHandler clientHandler) {
+        for (Channel channel : allChannels.values()) {
+            channel.getUsersInChannel().remove(clientHandler);
         }
     }
 

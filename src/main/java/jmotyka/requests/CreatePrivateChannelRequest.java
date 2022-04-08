@@ -19,5 +19,5 @@ public class CreatePrivateChannelRequest extends Request {
         this.isPrivate = isPrivate;
         this.permittedUsers = permittedUsers;
     }
-    
+
 }
